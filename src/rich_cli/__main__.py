@@ -104,7 +104,7 @@ class ForceWidth:
 @click.option("--line-numbers", "-n", is_flag=True, help="Enable line number in syntax")
 @click.option("--guides", "-g", is_flag=True, help="Enable indentation guides")
 @click.option("--lexer", "-x", default="default", help="Lexter for syntax")
-@click.option("--hyperlinks", is_flag=False, help="Render hyperlinks in markdown")
+@click.option("--hyperlinks", is_flag=True, help="Render hyperlinks in markdown")
 def main(
     resource: str,
     print: bool = False,
