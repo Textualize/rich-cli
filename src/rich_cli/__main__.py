@@ -1,5 +1,5 @@
 import sys
-from typing import Optional, List, TYPE_CHECKING
+from typing import NoReturn, Optional, List, TYPE_CHECKING
 
 import click
 from rich.console import Console, RenderableType
@@ -16,13 +16,18 @@ if TYPE_CHECKING:
     from rich.measure import Measurement
 
 
-def on_error(message: str, error: Optional[object] = None, code=-1) -> None:
+def on_error(message: str, error: Optional[object] = None, code=-1) -> NoReturn:
+    """Render an error message then exit the app."""
+
     if error:
-        error_console.print(
-            f"[b][red]{escape(message)}[/b]:[/red] {escape(str(error))}"
-        )
+        error_text = Text(message)
+        error_text.stylize("bold red")
+        error_text += ": "
+        error_text += error_console.highlighter(str(error))
+        error_console.print(error_text)
     else:
-        error_console.print(f"[b red]{escape(message)}")
+        error_text = Text(message, style="bold red")
+        error_console.print(error_text)
     sys.exit(code)
 
 
@@ -70,7 +75,7 @@ class ForceWidth:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        child_options = options.update_width(min(self.width, options.max_width))
+        child_options = options.update_width(self.width)
         yield from console.render(self.renderable, child_options)
 
     def __rich_measure__(
@@ -82,32 +87,48 @@ class ForceWidth:
 
 
 @click.command()
-@click.argument("resource")
-@click.option("--print", "-p", is_flag=True, help="Display as console markup")
-@click.option("--json", "-j", is_flag=True, help="Display as JSON")
-@click.option("--markdown", "--md", is_flag=True, help="Display as markdown")
-@click.option("--left", is_flag=True, help="Align to left")
-@click.option("--right", is_flag=True, help="Align to right")
-@click.option("--center", is_flag=True, help="Align to center")
-@click.option("--text-left", is_flag=True, help="Justify text to left")
-@click.option("--text-right", is_flag=True, help="Justify text to right")
-@click.option("--text-center", is_flag=True, help="Justify text to center")
-@click.option("--full", is_flag=True, help="Full justify text")
-@click.option("--expand", is_flag=True, help="Expand to full width")
-@click.option("--width", "-w", type=int, help="width of output", default=-1)
-@click.option("--max-width", type=int, help="maximum width", default=-1)
-@click.option("--style", "-s", help="Text style", default="")
-@click.option("--wrap", type=bool, default=True, help="Wrap syntax")
-@click.option("--padding", help="Padding around output")
-@click.option("--panel", type=click.Choice(BOXES), default="none", help="Box style")
-@click.option("--theme", "-t", help="Syntax theme", default="ansi_dark")
-@click.option("--line-numbers", "-n", is_flag=True, help="Enable line number in syntax")
-@click.option("--guides", "-g", is_flag=True, help="Enable indentation guides")
-@click.option("--lexer", "-x", default="default", help="Lexter for syntax")
-@click.option("--hyperlinks", is_flag=True, help="Render hyperlinks in markdown")
+@click.argument("resource", metavar="<PATH, TEXT, or '-' for stdin>")
+@click.option("--print", "-p", is_flag=True, help="Display as console markup.")
+@click.option("--rule", "-r", is_flag=True, help="Display a horizontal rule.")
+@click.option("--json", "-j", is_flag=True, help="Display as JSON.")
+@click.option("--markdown", "--md", is_flag=True, help="Display as markdown.")
+@click.option("--left", is_flag=True, help="Align to left.")
+@click.option("--right", is_flag=True, help="Align to right.")
+@click.option("--center", is_flag=True, help="Align to center.")
+@click.option("--text-left", is_flag=True, help="Justify text to left.")
+@click.option("--text-right", is_flag=True, help="Justify text to right.")
+@click.option("--text-center", is_flag=True, help="Justify text to center.")
+@click.option("--full", is_flag=True, help="Full justify text.")
+@click.option("--soft", "-o", is_flag=True, help="Soft wrap text (requires --print).")
+@click.option("--expand", is_flag=True, help="Expand to full width.")
+@click.option("--width", "-w", type=int, help="Width of output.", default=-1)
+@click.option("--max-width", type=int, help="Maximum width.", default=-1)
+@click.option("--style", "-s", metavar="STYLE", help="Text style", default="")
+@click.option(
+    "--rule-style", metavar="STYLE", help="Rule style", default="bright_green"
+)
+@click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
+@click.option("--padding", "-a", help="Padding around output")
+@click.option("--panel", type=click.Choice(BOXES), default="none", help="Box type.")
+@click.option(
+    "--border-style",
+    default="",
+    metavar="STYLE",
+    help="Border style (panel and table).",
+)
+@click.option("--title", default="", help="Panel title.")
+@click.option("--caption", default="", help="Panel caption.")
+@click.option("--theme", "-t", help="Syntax theme.", default="ansi_dark")
+@click.option(
+    "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
+)
+@click.option("--guides", "-g", is_flag=True, help="Enable indentation guides.")
+@click.option("--lexer", "-x", default="default", help="Lexter for syntax.")
+@click.option("--hyperlinks", "-l", is_flag=True, help="Render hyperlinks in markdown.")
 def main(
     resource: str,
     print: bool = False,
+    rule: bool = False,
     json: bool = False,
     markdown: bool = False,
     left: bool = False,
@@ -116,14 +137,19 @@ def main(
     text_left: bool = False,
     text_right: bool = False,
     text_center: bool = False,
+    soft: bool = False,
     full: bool = False,
     expand: bool = False,
     width: int = -1,
     max_width: int = -1,
     style: str = "",
-    wrap: bool = True,
+    rule_style: str = "",
+    no_wrap: bool = True,
     padding: str = "",
     panel: str = "",
+    border_style: str = "",
+    title: str = "",
+    caption: str = "",
     theme: str = "",
     line_numbers: bool = False,
     guides: bool = False,
@@ -141,41 +167,53 @@ def main(
         else:
             if len(print_padding) not in (1, 2, 4):
                 on_error(f"padding should be 1, 2 or 4 integers separated by commas")
-                sys.exit(-1)
 
     renderable: RenderableType = ""
-    if print:
+    if print or rule:
         from rich.text import Text
 
         justify = "default"
         if text_left:
             justify = "left"
-        if text_right:
+        elif text_right:
             justify = "right"
-        if text_center:
+        elif text_center:
             justify = "center"
-        if full:
+        elif full:
             justify = "full"
 
         if resource == "-":
-            resource = Text(sys.stdin.read(), justify=justify)
+            resource = Text(sys.stdin.read(), justify=justify, no_wrap=no_wrap)
         try:
             renderable = Text.from_markup(resource, justify=justify)
+            renderable.no_wrap = no_wrap
+
         except Exception as error:
             on_error(f"unable to parse console markup", error)
+
+        if rule:
+            from rich.rule import Rule
+            from rich.style import Style
+
+            try:
+                render_rule_style = Style.parse(rule_style)
+            except Exception as error:
+                on_error("unable to parse rule style", error)
+
+            renderable = Rule(
+                resource,
+                style=render_rule_style,
+                align="center" if justify in ("full", "default") else justify,
+            )
 
     elif json:
         from rich.json import JSON
 
-        if resource == "-":
-            json_data = sys.stdin.read()
-        else:
-            json_data = read_resource(resource)
+        json_data = read_resource(resource)
         try:
             renderable = JSON(json_data)
         except Exception as error:
-            error_console.print(str(error))
-            sys.exit(-1)
+            on_error("unable to read json", error)
 
     elif markdown:
         from rich.markdown import Markdown
@@ -187,26 +225,26 @@ def main(
 
         from rich.syntax import Syntax
 
-        if resource == "-":
-            renderable = Syntax(
-                sys.stdin.read(),
-                lexer,
-                theme=theme,
-                line_numbers=line_numbers,
-                indent_guides=guides,
-                word_wrap=wrap,
-            )
-        else:
-            try:
+        try:
+            if resource == "-":
+                renderable = Syntax(
+                    sys.stdin.read(),
+                    lexer,
+                    theme=theme,
+                    line_numbers=line_numbers,
+                    indent_guides=guides,
+                    word_wrap=not no_wrap,
+                )
+            else:
                 renderable = Syntax.from_path(
                     resource,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
-                    word_wrap=wrap,
+                    word_wrap=not no_wrap,
                 )
-            except Exception as error:
-                on_error("unable to read file", error)
+        except Exception as error:
+            on_error("unable to read file", error)
 
     if print_padding:
         from rich.padding import Padding
@@ -216,8 +254,21 @@ def main(
     if panel != "none":
         from rich import box
         from rich.panel import Panel
+        from rich.style import Style
 
-        renderable = Panel(renderable, getattr(box, panel.upper()), expand=expand)
+        try:
+            render_border_style = Style.parse(border_style)
+        except Exception as error:
+            on_error("unable to parse panel style", error)
+
+        renderable = Panel(
+            renderable,
+            getattr(box, panel.upper()),
+            expand=expand,
+            title=title,
+            subtitle=caption,
+            border_style=render_border_style,
+        )
 
     if style:
         from rich.style import Style
@@ -225,10 +276,13 @@ def main(
 
         try:
             text_style = Style.parse(style)
-        except Exception:
-            error_console.print(f"unable to parse style: {style!r}")
-            sys.exit(-1)
-        renderable = Styled(renderable, text_style)
+        except Exception as error:
+            on_error("unable to parse style", error)
+        else:
+            renderable = Styled(renderable, text_style)
+
+    if width > 0:
+        renderable = ForceWidth(renderable, width=width)
 
     justify = "default"
     if left:
@@ -238,11 +292,11 @@ def main(
     elif center:
         justify = "center"
 
-    if width != -1:
-        renderable = ForceWidth(renderable, width=width)
-
     console.print(
-        renderable, width=None if max_width < 0 else max_width, justify=justify
+        renderable,
+        width=None if max_width <= 0 else max_width,
+        justify=justify,
+        soft_wrap=soft,
     )
 
 
