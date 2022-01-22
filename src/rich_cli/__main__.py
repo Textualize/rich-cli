@@ -1,5 +1,5 @@
 import sys
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 
 import click
 from rich.console import Console, RenderableType
@@ -9,6 +9,11 @@ from rich.text import Text
 
 console = Console()
 error_console = Console(stderr=True)
+
+
+if TYPE_CHECKING:
+    from rich.console import ConsoleOptions, RenderResult
+    from rich.measure import Measurement
 
 
 def on_error(message: str, error: Optional[object] = None, code=-1) -> None:
@@ -53,6 +58,27 @@ def read_resource(path: str) -> str:
             return resource_file.read()
     except Exception as error:
         on_error(f"unable to read {escape(path)}", error)
+
+
+class ForceWidth:
+    """Force a renderable to a given width."""
+
+    def __init__(self, renderable: "RenderableType", width: int = 80) -> None:
+        self.renderable = renderable
+        self.width = width
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        child_options = options.update_width(min(self.width, options.max_width))
+        yield from console.render(self.renderable, child_options)
+
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
+        from rich.measure import Measurement
+
+        return Measurement(self.width, self.width)
 
 
 @click.command()
@@ -129,7 +155,7 @@ def main(
         if text_center:
             justify = "center"
         if full:
-            justify = "fill"
+            justify = "full"
 
         if resource == "-":
             resource = Text(sys.stdin.read(), justify=justify)
@@ -213,9 +239,7 @@ def main(
         justify = "center"
 
     if width != -1:
-        from rich.constrain import Constrain
-
-        renderable = Constrain(renderable, width)
+        renderable = ForceWidth(renderable, width=width)
 
     console.print(
         renderable, width=None if max_width < 0 else max_width, justify=justify
