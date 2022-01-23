@@ -31,27 +31,7 @@ def on_error(message: str, error: Optional[object] = None, code=-1) -> NoReturn:
     sys.exit(code)
 
 
-BOXES = [
-    "none",
-    "ascii",
-    "ascii2",
-    "ascii_double_head",
-    "square",
-    "square_double_head",
-    "minimal",
-    "minimal_heavy_head",
-    "minimal_double_head",
-    "simple",
-    "simple_head",
-    "simple_heavy",
-    "horizontals",
-    "rounded",
-    "heavy",
-    "heavy_edge",
-    "heavy_head",
-    "double",
-    "double_edge",
-]
+BOXES = ["none", "ascii", "square", "heavy", "double", "rounded"]
 
 
 def read_resource(path: str) -> str:
@@ -89,48 +69,54 @@ class ForceWidth:
 @click.command()
 @click.argument("resource", metavar="<PATH, TEXT, or '-' for stdin>")
 @click.option("--print", "-p", is_flag=True, help="Display as console markup.")
-@click.option("--rule", "-r", is_flag=True, help="Display a horizontal rule.")
+@click.option("--rule", "-u", is_flag=True, help="Display a horizontal rule.")
 @click.option("--json", "-j", is_flag=True, help="Display as JSON.")
-@click.option("--markdown", "--md", is_flag=True, help="Display as markdown.")
-@click.option("--left", is_flag=True, help="Align to left.")
-@click.option("--right", is_flag=True, help="Align to right.")
-@click.option("--center", is_flag=True, help="Align to center.")
-@click.option("--text-left", is_flag=True, help="Justify text to left.")
-@click.option("--text-right", is_flag=True, help="Justify text to right.")
-@click.option("--text-center", is_flag=True, help="Justify text to center.")
-@click.option("--full", is_flag=True, help="Full justify text.")
+@click.option("--markdown", "-m", is_flag=True, help="Display as markdown.")
+@click.option("--emoji", "-j", is_flag=True, help="Enable emoji code.")
+@click.option("--left", "-l", is_flag=True, help="Align to left.")
+@click.option("--right", "-r", is_flag=True, help="Align to right.")
+@click.option("--center", "-c", is_flag=True, help="Align to center.")
+@click.option("--text-left", "-L", is_flag=True, help="Justify text to left.")
+@click.option("--text-right", "-R", is_flag=True, help="Justify text to right.")
+@click.option("--text-center", "-C", is_flag=True, help="Justify text to center.")
+@click.option("--text-full", "-F", is_flag=True, help="Full justify text.")
 @click.option("--soft", "-o", is_flag=True, help="Soft wrap text (requires --print).")
-@click.option("--expand", is_flag=True, help="Expand to full width.")
+@click.option("--expand", "-e", is_flag=True, help="Expand to full width.")
 @click.option("--width", "-w", type=int, help="Width of output.", default=-1)
-@click.option("--max-width", type=int, help="Maximum width.", default=-1)
+@click.option("--max-width", "-W", type=int, help="Maximum width.", default=-1)
 @click.option("--style", "-s", metavar="STYLE", help="Text style", default="")
 @click.option(
-    "--rule-style", metavar="STYLE", help="Rule style", default="bright_green"
+    "--rule-style", "-R", metavar="STYLE", help="Rule style", default="bright_green"
 )
-@click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
-@click.option("--padding", "-a", help="Padding around output")
-@click.option("--panel", type=click.Choice(BOXES), default="none", help="Box type.")
+@click.option("--padding", "-d", help="Padding around output")
 @click.option(
-    "--border-style",
+    "--panel", "-a", type=click.Choice(BOXES), default="none", help="Panel type."
+)
+@click.option(
+    "--panel-style",
+    "-S",
     default="",
     metavar="STYLE",
     help="Border style (panel and table).",
 )
-@click.option("--title", default="", help="Panel title.")
-@click.option("--caption", default="", help="Panel caption.")
 @click.option("--theme", "-t", help="Syntax theme.", default="ansi_dark")
 @click.option(
     "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
 )
 @click.option("--guides", "-g", is_flag=True, help="Enable indentation guides.")
 @click.option("--lexer", "-x", default="default", help="Lexter for syntax.")
-@click.option("--hyperlinks", "-l", is_flag=True, help="Render hyperlinks in markdown.")
+@click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
+@click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
+@click.option("--title", default="", help="Panel title.")
+@click.option("--caption", default="", help="Panel caption.")
+@click.option("--export-html", "-o", default="", help="Write HTML")
 def main(
     resource: str,
     print: bool = False,
     rule: bool = False,
     json: bool = False,
     markdown: bool = False,
+    emoji: bool = False,
     left: bool = False,
     right: bool = False,
     center: bool = False,
@@ -138,7 +124,7 @@ def main(
     text_right: bool = False,
     text_center: bool = False,
     soft: bool = False,
-    full: bool = False,
+    text_full: bool = False,
     expand: bool = False,
     width: int = -1,
     max_width: int = -1,
@@ -147,7 +133,7 @@ def main(
     no_wrap: bool = True,
     padding: str = "",
     panel: str = "",
-    border_style: str = "",
+    panel_style: str = "",
     title: str = "",
     caption: str = "",
     theme: str = "",
@@ -155,8 +141,13 @@ def main(
     guides: bool = False,
     lexer: str = "",
     hyperlinks: bool = False,
+    export_html: bool = False,
 ):
-    console = Console()
+    """Rich toolbox for console output."""
+    console = Console(emoji=emoji, record=export_html)
+
+    if width > 0:
+        expand = True
 
     print_padding: List[int] = []
     if padding:
@@ -179,7 +170,7 @@ def main(
             justify = "right"
         elif text_center:
             justify = "center"
-        elif full:
+        elif text_full:
             justify = "full"
 
         if resource == "-":
@@ -257,7 +248,7 @@ def main(
         from rich.style import Style
 
         try:
-            render_border_style = Style.parse(border_style)
+            render_border_style = Style.parse(panel_style)
         except Exception as error:
             on_error("unable to parse panel style", error)
 
@@ -298,6 +289,12 @@ def main(
         justify=justify,
         soft_wrap=soft,
     )
+
+    if export_html:
+        try:
+            console.save_html(export_html)
+        except Exception as error:
+            on_error("failed to save HTML", error)
 
 
 def run():

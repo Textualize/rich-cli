@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rich-cli"
-version = "0.1.0a0"
+version = "0.1.0"
 description = "Command Line Interface to Rich"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
