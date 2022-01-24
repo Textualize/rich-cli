@@ -219,22 +219,11 @@ def main(
 
         from rich.syntax import Syntax
 
-        if head and tail:
-            on_error("cannot specify both head and tail")
-
-        if head:
-            line_range = (0, head)
-        elif tail:
-            num_lines = len(read_resource(resource).splitlines())
-            start_line = num_lines - tail + 2
-            finish_line = num_lines + 1
-            line_range = (start_line, finish_line)
-        else:
-            line_range = None
-
         try:
             if resource == "-":
                 string = sys.stdin.read()
+                num_lines = len(string.splitlines())
+                line_range = _line_range(head, tail, num_lines)
                 renderable = Syntax(
                     string,
                     lexer,
@@ -245,6 +234,8 @@ def main(
                     line_range=line_range,
                 )
             else:
+                num_lines = len(read_resource(resource).splitlines())
+                line_range = _line_range(head, tail, num_lines)
                 renderable = Syntax.from_path(
                     resource,
                     theme=theme,
@@ -314,6 +305,20 @@ def main(
             console.save_html(export_html)
         except Exception as error:
             on_error("failed to save HTML", error)
+
+
+def _line_range(head, tail, num_lines):
+    if head and tail:
+        on_error("cannot specify both head and tail")
+    if head:
+        line_range = (0, head)
+    elif tail:
+        start_line = num_lines - tail + 2
+        finish_line = num_lines + 1
+        line_range = (start_line, finish_line)
+    else:
+        line_range = None
+    return line_range
 
 
 def run():
