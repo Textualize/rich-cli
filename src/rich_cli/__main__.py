@@ -6,7 +6,6 @@ from rich.console import Console, RenderableType
 from rich.markup import escape
 from rich.text import Text
 
-
 console = Console()
 error_console = Console(stderr=True)
 
@@ -81,6 +80,8 @@ class ForceWidth:
 @click.option("--text-center", "-C", is_flag=True, help="Justify text to center.")
 @click.option("--text-full", "-F", is_flag=True, help="Full justify text.")
 @click.option("--soft", "-o", is_flag=True, help="Soft wrap text (requires --print).")
+@click.option("--head", type=click.IntRange(min=1), default=None, help="Display head of the file.")
+@click.option("--tail", type=click.IntRange(min=1), default=None, help="Display tail of the file.")
 @click.option("--expand", "-e", is_flag=True, help="Expand to full width.")
 @click.option("--width", "-w", type=int, help="Width of output.", default=-1)
 @click.option("--max-width", "-W", type=int, help="Maximum width.", default=-1)
@@ -124,6 +125,8 @@ def main(
     text_right: bool = False,
     text_center: bool = False,
     soft: bool = False,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
     text_full: bool = False,
     expand: bool = False,
     width: int = -1,
@@ -216,15 +219,30 @@ def main(
 
         from rich.syntax import Syntax
 
+        if head and tail:
+            on_error("cannot specify both head and tail")
+
+        if head:
+            line_range = (0, head)
+        elif tail:
+            num_lines = len(read_resource(resource).splitlines())
+            start_line = num_lines - tail + 2
+            finish_line = num_lines + 1
+            line_range = (start_line, finish_line)
+        else:
+            line_range = None
+
         try:
             if resource == "-":
+                string = sys.stdin.read()
                 renderable = Syntax(
-                    sys.stdin.read(),
+                    string,
                     lexer,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
             else:
                 renderable = Syntax.from_path(
@@ -233,6 +251,7 @@ def main(
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
         except Exception as error:
             on_error("unable to read file", error)
