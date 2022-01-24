@@ -236,6 +236,7 @@ def main(
             else:
                 num_lines = len(read_resource(resource).splitlines())
                 line_range = _line_range(head, tail, num_lines)
+
                 renderable = Syntax.from_path(
                     resource,
                     theme=theme,
@@ -311,7 +312,7 @@ def _line_range(head, tail, num_lines):
     if head and tail:
         on_error("cannot specify both head and tail")
     if head:
-        line_range = (0, head)
+        line_range = (1, head)
     elif tail:
         start_line = num_lines - tail + 2
         finish_line = num_lines + 1
