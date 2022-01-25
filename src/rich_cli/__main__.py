@@ -6,10 +6,8 @@ from rich.console import Console, RenderableType
 from rich.markup import escape
 from rich.text import Text
 
-
 console = Console()
 error_console = Console(stderr=True)
-
 
 if TYPE_CHECKING:
     from rich.console import ConsoleOptions, RenderResult
@@ -109,6 +107,8 @@ class ForceWidth:
 @click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
 @click.option("--title", default="", help="Panel title.")
 @click.option("--caption", default="", help="Panel caption.")
+@click.option("--force-terminal/--no-force-terminal", "-f", default=None,
+              help="Force enable/disable terminal control codes.")
 @click.option("--export-html", "-o", default="", help="Write HTML")
 def main(
     resource: str,
@@ -141,10 +141,11 @@ def main(
     guides: bool = False,
     lexer: str = "",
     hyperlinks: bool = False,
+    force_terminal: Optional[bool] = None,
     export_html: bool = False,
 ):
     """Rich toolbox for console output."""
-    console = Console(emoji=emoji, record=export_html)
+    console = Console(emoji=emoji, record=export_html, force_terminal=force_terminal)
 
     if width > 0:
         expand = True
