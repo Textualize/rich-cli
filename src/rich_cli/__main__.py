@@ -153,7 +153,7 @@ class RichCommand(click.Command):
     "--print",
     "-p",
     is_flag=True,
-    help="Print [u]console markup[/u].",
+    help="Print [u]console markup[/u]. [dim]See https://rich.readthedocs.io/en/latest/markup.html",
 )
 @click.option("--rule", "-u", is_flag=True, help="Display a horizontal [u]rule[/u].")
 @click.option("--json", "-j", is_flag=True, help="Display as [u]JSON[/u].")
@@ -214,7 +214,7 @@ class RichCommand(click.Command):
 @click.option(
     "--rule-style",
     metavar="STYLE",
-    help="Set rule style to [b]STYLE[/b]",
+    help="Set rule style to [b]STYLE[/b].",
     default="bright_green",
 )
 @click.option(
