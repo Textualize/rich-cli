@@ -112,11 +112,7 @@ class RichCommand(click.Command):
 
         from rich.panel import Panel
 
-        options_table = Table(
-            highlight=True,
-            box=None,
-            show_header=False,
-        )
+        options_table = Table(highlight=True, box=None, show_header=False)
 
         for param in self.get_params(ctx)[1:]:
 
@@ -163,6 +159,22 @@ class RichCommand(click.Command):
 @click.option("--json", "-j", is_flag=True, help="Display as [u]JSON[/u].")
 @click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
 @click.option(
+    "--head",
+    "-h",
+    type=click.IntRange(min=1),
+    metavar="LINES",
+    default=None,
+    help="Display first [b]LINES[/] of the file.",
+)
+@click.option(
+    "--tail",
+    "-t",
+    type=click.IntRange(min=1),
+    metavar="LINES",
+    default=None,
+    help="Display last [b]LINES[/] of the file.",
+)
+@click.option(
     "--emoji", "-j", is_flag=True, help="Enable emoji code. [dim]e.g. :sparkle:"
 )
 @click.option("--left", "-l", is_flag=True, help="Align to left.")
@@ -171,40 +183,44 @@ class RichCommand(click.Command):
 @click.option("--text-left", "-L", is_flag=True, help="Justify text to left.")
 @click.option("--text-right", "-R", is_flag=True, help="Justify text to right.")
 @click.option("--text-center", "-C", is_flag=True, help="Justify text to center.")
-@click.option("--text-full", "-F", is_flag=True, help="Full justify text.")
-@click.option("--soft", is_flag=True, help="Soft wrap text (requires --print).")
+@click.option(
+    "--text-full", "-F", is_flag=True, help="Justify text to both left and right edges."
+)
+@click.option(
+    "--soft", is_flag=True, help="Enable soft wrapping of text (requires --print)."
+)
 @click.option(
     "--expand", "-e", is_flag=True, help="Expand to full width (requires --panel)."
 )
 @click.option(
-    "--width", "-w", metavar="SIZE", type=int, help="Width of output.", default=-1
+    "--width",
+    "-w",
+    metavar="SIZE",
+    type=int,
+    help="Fit output to [b]SIZE[/] characters.",
+    default=-1,
 )
 @click.option(
-    "--max-width", "-W", metavar="SIZE", type=int, help="Maximum width.", default=-1
-)
-@click.option("--style", "-s", metavar="STYLE", help="Text style.", default="")
-@click.option(
-    "--rule-style", metavar="STYLE", help="Rule style.", default="bright_green"
-)
-@click.option(
-    "--head",
-    "-h",
-    type=click.IntRange(min=1),
-    metavar="LINES",
-    default=None,
-    help="Display head of the file.",
+    "--max-width",
+    "-W",
+    metavar="SIZE",
+    type=int,
+    help="Set maximum width to [b]SIZE[/] characters.",
+    default=-1,
 )
 @click.option(
-    "--tail",
-    type=click.IntRange(min=1),
-    metavar="LINES",
-    default=None,
-    help="Display tail of the file.",
+    "--style", "-s", metavar="STYLE", help="Set text style to [b]STYLE[/b].", default=""
+)
+@click.option(
+    "--rule-style",
+    metavar="STYLE",
+    help="Set rule style to [b]STYLE[/b]",
+    default="bright_green",
 )
 @click.option(
     "--rule-char",
-    metavar="CHARACTER(S)",
-    help="Set the character used to render a line with --rule.",
+    metavar="CHARACTER",
+    help="Use [b]CHARACTER[/b] to generate a line with --rule.",
 )
 @click.option(
     "--padding",
@@ -215,40 +231,63 @@ class RichCommand(click.Command):
 @click.option(
     "--panel",
     "-a",
+    default="none",
     type=click.Choice(BOXES),
     metavar="BOX",
-    help=f"Panel type. [dim]{BOX_TEXT}",
+    help=f"Set panel type to [b]BOX[/b]. [dim]{BOX_TEXT}",
 )
 @click.option(
     "--panel-style",
     "-S",
     default="",
     metavar="STYLE",
-    help="Border style.",
+    help="Set the panel style to [b]STYLE[/b] (required --panel).",
 )
 @click.option(
     "--theme",
-    "-m",
     metavar="THEME",
-    help="Syntax theme. [dim]See https://pygments.org/styles/",
+    help="Set syntax theme to [b]THEME[/b]. [dim]See https://pygments.org/styles/",
     default="ansi_dark",
 )
 @click.option(
     "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
 )
-@click.option("--guides", "-g", is_flag=True, help="Enable indentation guides.")
-@click.option("--lexer", "-x", default="default", help="Lexer for syntax.")
+@click.option(
+    "--guides",
+    "-g",
+    is_flag=True,
+    help="Enable indentation guides in syntax highlighting",
+)
+@click.option(
+    "--lexer",
+    "-x",
+    metavar="LEXER",
+    default="default",
+    help="Use [b]LEXER[/b] for syntax highlighting. [dim]See https://pygments.org/docs/lexers/",
+)
 @click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
-@click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
-@click.option("--title", default="", help="Panel title.")
-@click.option("--caption", default="", help="Panel caption.")
+@click.option(
+    "--no-wrap", is_flag=True, help="Don't word wrap syntax highlighted files."
+)
+@click.option(
+    "--title", metavar="TEXT", default="", help="Set panel title to [b]TEXT[/]."
+)
+@click.option(
+    "--caption", metavar="TEXT", default="", help="Set panel caption to [b]TEXT[/]."
+)
 @click.option(
     "--force-terminal",
     "-f",
     default=None,
     help="Force terminal output when not writing to a terminal.",
 )
-@click.option("--export-html", "-o", default="", help="Write HTML")
+@click.option(
+    "--export-html",
+    "-o",
+    metavar="PATH",
+    default="",
+    help="Write HTML to [b]PATH",
+)
 def main(
     resource: str,
     print: bool = False,
