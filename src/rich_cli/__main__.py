@@ -220,6 +220,7 @@ class RichCommand(click.Command):
 @click.option(
     "--rule-char",
     metavar="CHARACTER",
+    default="─",
     help="Use [b]CHARACTER[/b] to generate a line with --rule.",
 )
 @click.option(
@@ -376,7 +377,7 @@ def main(
             renderable = Rule(
                 resource,
                 style=render_rule_style,
-                characters=rule_char,
+                characters=rule_char or "─",
                 align="center" if justify in ("full", "default") else justify,
             )
 
