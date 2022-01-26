@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from rich.console import ConsoleOptions, RenderResult
     from rich.measure import Measurement
 
+VERSION = "1.0"
 
 BOXES = [
     "none",
@@ -101,7 +102,7 @@ class RichCommand(click.Command):
         )
 
         console.print(
-            "[b]Rich CLI[/b] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
+            f"[b]Rich CLI[/b] [cyan]v{VERSION}[/] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
             justify="center",
         )
 
@@ -109,7 +110,6 @@ class RichCommand(click.Command):
             "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH or TEXT or '-'>\n"
         )
 
-        from rich import box
         from rich.panel import Panel
 
         options_table = Table(
@@ -141,10 +141,6 @@ class RichCommand(click.Command):
                 options += f" {param.metavar}"
 
             options_table.add_row(opt1, opt2, highlighter(help))
-
-            # rv = param.get_help_record(ctx)
-            # if rv is not None:
-            #     opts.append(rv)
 
         console.print(
             Panel(
@@ -191,6 +187,21 @@ class RichCommand(click.Command):
     "--rule-style", metavar="STYLE", help="Rule style.", default="bright_green"
 )
 @click.option(
+    "--head",
+    "-h",
+    type=click.IntRange(min=1),
+    metavar="LINES",
+    default=None,
+    help="Display head of the file.",
+)
+@click.option(
+    "--tail",
+    type=click.IntRange(min=1),
+    metavar="LINES",
+    default=None,
+    help="Display tail of the file.",
+)
+@click.option(
     "--rule-char",
     metavar="CHARACTER(S)",
     help="Set the character used to render a line with --rule.",
@@ -217,7 +228,7 @@ class RichCommand(click.Command):
 )
 @click.option(
     "--theme",
-    "-t",
+    "-m",
     metavar="THEME",
     help="Syntax theme. [dim]See https://pygments.org/styles/",
     default="ansi_dark",
@@ -253,6 +264,8 @@ def main(
     text_right: bool = False,
     text_center: bool = False,
     soft: bool = False,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
     text_full: bool = False,
     expand: bool = False,
     width: int = -1,
@@ -349,21 +362,29 @@ def main(
 
         try:
             if resource == "-":
+                string = sys.stdin.read()
+                num_lines = len(string.splitlines())
+                line_range = _line_range(head, tail, num_lines)
                 renderable = Syntax(
-                    sys.stdin.read(),
+                    string,
                     lexer,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
             else:
+                num_lines = len(read_resource(resource).splitlines())
+                line_range = _line_range(head, tail, num_lines)
+
                 renderable = Syntax.from_path(
                     resource,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
         except Exception as error:
             on_error("unable to read file", error)
@@ -426,6 +447,20 @@ def main(
             console.save_html(export_html)
         except Exception as error:
             on_error("failed to save HTML", error)
+
+
+def _line_range(head, tail, num_lines):
+    if head and tail:
+        on_error("cannot specify both head and tail")
+    if head:
+        line_range = (1, head)
+    elif tail:
+        start_line = num_lines - tail + 2
+        finish_line = num_lines + 1
+        line_range = (start_line, finish_line)
+    else:
+        line_range = None
+    return line_range
 
 
 def run():
