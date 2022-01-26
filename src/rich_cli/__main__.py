@@ -335,7 +335,7 @@ def main(
     if padding:
         try:
             print_padding = [int(pad) for pad in padding.split(",")]
-        except TypeError:
+        except Exception:
             on_error(f"padding should be 1, 2 or 4 integers separated by commas")
         else:
             if len(print_padding) not in (1, 2, 4):
