@@ -3,6 +3,7 @@ from typing import NoReturn, Optional, List, TYPE_CHECKING
 
 import click
 from rich.console import Console, RenderableType
+
 from rich.markup import escape
 from rich.text import Text
 
@@ -12,6 +13,19 @@ error_console = Console(stderr=True)
 if TYPE_CHECKING:
     from rich.console import ConsoleOptions, RenderResult
     from rich.measure import Measurement
+
+
+BOXES = [
+    "none",
+    "ascii",
+    "ascii2",
+    "square",
+    "rounded",
+    "heavy",
+    "double",
+]
+
+BOX_TEXT = ", ".join(BOXES)
 
 
 def on_error(message: str, error: Optional[object] = None, code=-1) -> NoReturn:
@@ -27,9 +41,6 @@ def on_error(message: str, error: Optional[object] = None, code=-1) -> NoReturn:
         error_text = Text(message, style="bold red")
         error_console.print(error_text)
     sys.exit(code)
-
-
-BOXES = ["none", "ascii", "square", "heavy", "double", "rounded"]
 
 
 def read_resource(path: str) -> str:
@@ -64,13 +75,100 @@ class ForceWidth:
         return Measurement(self.width, self.width)
 
 
-@click.command()
-@click.argument("resource", metavar="<PATH, TEXT, or '-' for stdin>")
-@click.option("--print", "-p", is_flag=True, help="Display as console markup.")
-@click.option("--rule", "-u", is_flag=True, help="Display a horizontal rule.")
-@click.option("--json", "-j", is_flag=True, help="Display as JSON.")
-@click.option("--markdown", "-m", is_flag=True, help="Display as markdown.")
-@click.option("--emoji", "-j", is_flag=True, help="Enable emoji code.")
+class RichCommand(click.Command):
+    def format_help(self, ctx, formatter):
+
+        from rich.highlighter import RegexHighlighter
+        from rich.table import Table
+        from rich.theme import Theme
+
+        class OptionHighlighter(RegexHighlighter):
+            highlights = [
+                r"(?P<switch>\-\w)",
+                r"(?P<option>\-\-[\w\-]+)",
+            ]
+
+        highlighter = OptionHighlighter()
+
+        console = Console(
+            theme=Theme(
+                {
+                    "option": "bold cyan",
+                    "switch": "bold green",
+                }
+            ),
+            highlighter=highlighter,
+        )
+
+        console.print(
+            "[b]Rich CLI[/b] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
+            justify="center",
+        )
+
+        console.print(
+            "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH or TEXT or '-'>\n"
+        )
+
+        from rich import box
+        from rich.panel import Panel
+
+        options_table = Table(
+            highlight=True,
+            box=None,
+            show_header=False,
+        )
+
+        for param in self.get_params(ctx)[1:]:
+
+            if len(param.opts) == 2:
+                opt1 = highlighter(param.opts[1])
+                opt2 = highlighter(param.opts[0])
+            else:
+                opt2 = highlighter(param.opts[0])
+                opt1 = Text("")
+
+            if param.metavar:
+                opt2 += Text(f" {param.metavar}", style="bold yellow")
+
+            options = Text(" ".join(reversed(param.opts)))
+            help_record = param.get_help_record(ctx)
+            if help_record is None:
+                help = ""
+            else:
+                help = Text.from_markup(param.get_help_record(ctx)[-1], emoji=False)
+
+            if param.metavar:
+                options += f" {param.metavar}"
+
+            options_table.add_row(opt1, opt2, highlighter(help))
+
+            # rv = param.get_help_record(ctx)
+            # if rv is not None:
+            #     opts.append(rv)
+
+        console.print(
+            Panel(
+                options_table, border_style="dim", title="Options", title_align="left"
+            )
+        )
+
+        console.print("[dim]:heart: https://www.textualize.io", justify="right")
+
+
+@click.command(cls=RichCommand)
+@click.argument("resource", metavar="<PATH or TEXT or '-'>")
+@click.option(
+    "--print",
+    "-p",
+    is_flag=True,
+    help="Print [u]console markup[/u].",
+)
+@click.option("--rule", "-u", is_flag=True, help="Display a horizontal [u]rule[/u].")
+@click.option("--json", "-j", is_flag=True, help="Display as [u]JSON[/u].")
+@click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
+@click.option(
+    "--emoji", "-j", is_flag=True, help="Enable emoji code. [dim]e.g. :sparkle:"
+)
 @click.option("--left", "-l", is_flag=True, help="Align to left.")
 @click.option("--right", "-r", is_flag=True, help="Align to right.")
 @click.option("--center", "-c", is_flag=True, help="Align to center.")
@@ -78,42 +176,73 @@ class ForceWidth:
 @click.option("--text-right", "-R", is_flag=True, help="Justify text to right.")
 @click.option("--text-center", "-C", is_flag=True, help="Justify text to center.")
 @click.option("--text-full", "-F", is_flag=True, help="Full justify text.")
-@click.option("--soft", "-o", is_flag=True, help="Soft wrap text (requires --print).")
-@click.option("--expand", "-e", is_flag=True, help="Expand to full width.")
-@click.option("--width", "-w", type=int, help="Width of output.", default=-1)
-@click.option("--max-width", "-W", type=int, help="Maximum width.", default=-1)
-@click.option("--style", "-s", metavar="STYLE", help="Text style", default="")
+@click.option("--soft", is_flag=True, help="Soft wrap text (requires --print).")
 @click.option(
-    "--rule-style", "-R", metavar="STYLE", help="Rule style", default="bright_green"
+    "--expand", "-e", is_flag=True, help="Expand to full width (requires --panel)."
 )
-@click.option("--padding", "-d", help="Padding around output")
 @click.option(
-    "--panel", "-a", type=click.Choice(BOXES), default="none", help="Panel type."
+    "--width", "-w", metavar="SIZE", type=int, help="Width of output.", default=-1
+)
+@click.option(
+    "--max-width", "-W", metavar="SIZE", type=int, help="Maximum width.", default=-1
+)
+@click.option("--style", "-s", metavar="STYLE", help="Text style.", default="")
+@click.option(
+    "--rule-style", metavar="STYLE", help="Rule style.", default="bright_green"
+)
+@click.option(
+    "--rule-char",
+    metavar="CHARACTER(S)",
+    help="Set the character used to render a line with --rule.",
+)
+@click.option(
+    "--padding",
+    "-d",
+    metavar="TOP,RIGHT,BOTTOM,LEFT",
+    help="Padding around output. [dim]1, 2 or four integers, e.g. 2,4",
+)
+@click.option(
+    "--panel",
+    "-a",
+    type=click.Choice(BOXES),
+    metavar="BOX",
+    help=f"Panel type. [dim]{BOX_TEXT}",
 )
 @click.option(
     "--panel-style",
     "-S",
     default="",
     metavar="STYLE",
-    help="Border style (panel and table).",
+    help="Border style.",
 )
-@click.option("--theme", "-t", help="Syntax theme.", default="ansi_dark")
+@click.option(
+    "--theme",
+    "-t",
+    metavar="THEME",
+    help="Syntax theme. [dim]See https://pygments.org/styles/",
+    default="ansi_dark",
+)
 @click.option(
     "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
 )
 @click.option("--guides", "-g", is_flag=True, help="Enable indentation guides.")
-@click.option("--lexer", "-x", default="default", help="Lexter for syntax.")
+@click.option("--lexer", "-x", default="default", help="Lexer for syntax.")
 @click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
 @click.option("--no-wrap", is_flag=True, help="Wrap syntax.")
 @click.option("--title", default="", help="Panel title.")
 @click.option("--caption", default="", help="Panel caption.")
-@click.option("--force-terminal/--no-force-terminal", "-f", default=None,
-              help="Force enable/disable terminal control codes.")
+@click.option(
+    "--force-terminal",
+    "-f",
+    default=None,
+    help="Force terminal output when not writing to a terminal.",
+)
 @click.option("--export-html", "-o", default="", help="Write HTML")
 def main(
     resource: str,
     print: bool = False,
     rule: bool = False,
+    rule_char: Optional[str] = None,
     json: bool = False,
     markdown: bool = False,
     emoji: bool = False,
@@ -195,6 +324,7 @@ def main(
             renderable = Rule(
                 resource,
                 style=render_rule_style,
+                characters=rule_char,
                 align="center" if justify in ("full", "default") else justify,
             )
 
