@@ -79,6 +79,8 @@ class ForceWidth:
 @click.option("--text-center", "-C", is_flag=True, help="Justify text to center.")
 @click.option("--text-full", "-F", is_flag=True, help="Full justify text.")
 @click.option("--soft", "-o", is_flag=True, help="Soft wrap text (requires --print).")
+@click.option("--head", type=click.IntRange(min=1), default=None, help="Display head of the file.")
+@click.option("--tail", type=click.IntRange(min=1), default=None, help="Display tail of the file.")
 @click.option("--expand", "-e", is_flag=True, help="Expand to full width.")
 @click.option("--width", "-w", type=int, help="Width of output.", default=-1)
 @click.option("--max-width", "-W", type=int, help="Maximum width.", default=-1)
@@ -124,6 +126,8 @@ def main(
     text_right: bool = False,
     text_center: bool = False,
     soft: bool = False,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
     text_full: bool = False,
     expand: bool = False,
     width: int = -1,
@@ -219,21 +223,29 @@ def main(
 
         try:
             if resource == "-":
+                string = sys.stdin.read()
+                num_lines = len(string.splitlines())
+                line_range = _line_range(head, tail, num_lines)
                 renderable = Syntax(
-                    sys.stdin.read(),
+                    string,
                     lexer,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
             else:
+                num_lines = len(read_resource(resource).splitlines())
+                line_range = _line_range(head, tail, num_lines)
+
                 renderable = Syntax.from_path(
                     resource,
                     theme=theme,
                     line_numbers=line_numbers,
                     indent_guides=guides,
                     word_wrap=not no_wrap,
+                    line_range=line_range,
                 )
         except Exception as error:
             on_error("unable to read file", error)
@@ -296,6 +308,20 @@ def main(
             console.save_html(export_html)
         except Exception as error:
             on_error("failed to save HTML", error)
+
+
+def _line_range(head, tail, num_lines):
+    if head and tail:
+        on_error("cannot specify both head and tail")
+    if head:
+        line_range = (1, head)
+    elif tail:
+        start_line = num_lines - tail + 2
+        finish_line = num_lines + 1
+        line_range = (start_line, finish_line)
+    else:
+        line_range = None
+    return line_range
 
 
 def run():
