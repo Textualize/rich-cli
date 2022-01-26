@@ -226,7 +226,7 @@ class RichCommand(click.Command):
     "--padding",
     "-d",
     metavar="TOP,RIGHT,BOTTOM,LEFT",
-    help="Padding around output. [dim]1, 2 or four integers, e.g. 2,4",
+    help="Padding around output. [dim]1, 2 or 4 comma separated integers, e.g. 2,4",
 )
 @click.option(
     "--panel",
@@ -358,7 +358,7 @@ def main(
         if resource == "-":
             resource = Text(sys.stdin.read(), justify=justify, no_wrap=no_wrap)
         try:
-            renderable = Text.from_markup(resource, justify=justify)
+            renderable = Text.from_markup(resource, justify=justify, emoji=emoji)
             renderable.no_wrap = no_wrap
 
         except Exception as error:
