@@ -310,7 +310,7 @@ class RichCommand(click.Command):
     "-o",
     metavar="PATH",
     default="",
-    help="Write HTML to [b]PATH",
+    help="Write HTML to [b]PATH[/b].",
 )
 def main(
     resource: str,
