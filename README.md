@@ -2,7 +2,7 @@
 
 Rich-cli is a command line toolbox for fancy output in the terminal, built with [Rich](https://github.com/Textualize/rich).
 
-Rich-cli can syntax highlight a large number of file types in the terminal, with specialized rendering for Markdown and JSON files. It also provides an interface to console text rendering with many options to format and style your output.
+Rich-cli can syntax highlight a large number of file types in the terminal, with specialized rendering for Markdown and JSON files. The `rich` command also provides an interface to console text rendering with many options to format and style your output.
 
 ## Installation
 
