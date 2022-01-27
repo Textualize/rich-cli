@@ -19,3 +19,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 rich = 'rich_cli.__main__:run'
+
+[tool.poetry.plugins."pipx.run"]
+rich-cli = 'rich_cli.__main__:run'
