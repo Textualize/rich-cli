@@ -32,7 +32,7 @@ To syntax highlight a file enter `rich` followed by the path to your file. Many 
 rich loop.py
 ```
 
-![syntax1](./imgs/syntax1.png)
+![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax1.png)
 
 Add the `--line-number` or `-n` switch to enable line numbers. Add `--guides` or `-g` to enable indentation guides.
 
@@ -40,7 +40,7 @@ Add the `--line-number` or `-n` switch to enable line numbers. Add `--guides` or
 rich loop.py -n -g
 ```
 
-![syntax2](./imgs/syntax2.png)
+![syntax2](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax2.png)
 
 You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
 
@@ -48,7 +48,7 @@ You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
 rich loop.py --theme dracula
 ```
 
-![syntax1](./imgs/syntax3.png)
+![syntax3](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax3.png)
 
 By default, `rich` will wrap lines if they don't fit within the available width. You can disable this behavior with `--no-wrap`.
 
@@ -62,7 +62,7 @@ You can request markdown rendering by adding the `--markdown` switch or `-m`.
 rich README.md -m
 ```
 
-![syntax1](./imgs/markdown1.png)
+![markdown1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/markdown1.png)
 
 If your terminal supports hyperlinks, you can add `--hyperlinks` or `-y` which will output hyperlinks rather than full URLs.
 
@@ -78,7 +78,7 @@ You can request JSON pretty formatting and highlighting with the `--json` or `-j
 rich cats.json --json
 ```
 
-![syntax1](./imgs/json1.png)
+![json1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/json1.png)
 
 ### Rules
 
@@ -90,7 +90,7 @@ rich "Hello [b]World[b]!" --rule --rule-style "red"
 rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 ```
 
-![syntax1](./imgs/rules1.png)
+![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rules1.png)
 
 ## Exporting
 
@@ -110,7 +110,7 @@ If you add the `--print` or `--p` option then Rich will treat the first argument
 rich "Hello, [bold magenta]World[/]!" --print
 ```
 
-![syntax1](./imgs/printing1.png)
+![printin1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/printing1.png)
 
 ### Soft wrapping
 
@@ -138,7 +138,7 @@ You can set a style to apply to the output with `--style` or `-s`. The styles ar
 rich "Hello, [b]World[/b]!" --print --style "on blue"
 ```
 
-![style1](./imgs/style1.png)
+![style1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/style1.png)
 
 ### Alignment
 
@@ -148,7 +148,7 @@ You can align output to the left, center, or right with the `--left`, `--center`
 rich "Hello [b]World[/b]!" --print --center
 ```
 
-![alignment1](./imgs/alignment1.png)
+![alignment1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/alignment1.png)
 
 ### Width
 
@@ -158,7 +158,7 @@ You can set the width of the output with `--width` or `-w` and the desired width
 rich "I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration." -p -w 40
 ```
 
-![width](./imgs/width1.png)
+![width](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/width1.png)
 
 ### Text Justify
 
@@ -183,7 +183,7 @@ You can apply _padding_ around the output with `--padding` or `-d`.
 rich "Hello [b]World[/b]!" -p -c --padding 3 --style "on blue"
 ```
 
-![padding1](./imgs/padding1.png)
+![padding1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/padding1.png)
 
 ### Panel
 
@@ -193,4 +193,4 @@ You can draw a _panel_ around content with `--panel` or `-a`, which takes one of
 rich "Hello, [b]World[/b]!" -p -a heavy
 ```
 
-![panel1](./imgs/panel1.png)
+![panel1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/panel1.png)
