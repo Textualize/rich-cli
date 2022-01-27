@@ -29,7 +29,7 @@ BOXES = [
 BOX_TEXT = ", ".join(BOXES)
 
 
-def on_error(message: str, error: Optional[object] = None, code=-1) -> NoReturn:
+def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
     """Render an error message then exit the app."""
 
     if error:
@@ -79,6 +79,7 @@ class ForceWidth:
 def blend_text(
     message: str, color1: tuple[int, int, int], color2: tuple[int, int, int]
 ) -> Text:
+    """Blend text from one color to another."""
     text = Text(message)
     r1, g1, b1 = color1
     r2, g2, b2 = color2
@@ -94,9 +95,14 @@ def blend_text(
 
 
 class RichCommand(click.Command):
+    """Override Clicks help with a Richer version."""
+
+    # TODO: Extract this in to a general tool, i.e. rich-click
+
     def format_help(self, ctx, formatter):
 
         from rich.highlighter import RegexHighlighter
+        from rich.panel import Panel
         from rich.table import Table
         from rich.theme import Theme
 
@@ -126,8 +132,6 @@ class RichCommand(click.Command):
         console.print(
             "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH or TEXT or '-'>\n"
         )
-
-        from rich.panel import Panel
 
         options_table = Table(highlight=True, box=None, show_header=False)
 
@@ -343,10 +347,12 @@ def main(
     lexer: str = "",
     hyperlinks: bool = False,
     force_terminal: Optional[bool] = None,
-    export_html: bool = False,
+    export_html: Optional[str] = None,
 ):
     """Rich toolbox for console output."""
-    console = Console(emoji=emoji, record=export_html, force_terminal=force_terminal)
+    console = Console(
+        emoji=emoji, record=bool(export_html), force_terminal=force_terminal
+    )
 
     if width > 0:
         expand = True
