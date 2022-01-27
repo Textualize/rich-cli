@@ -21,18 +21,18 @@ pipx install rich-cli
 Once installed, you should have the `rich` command on your path.
 
 ```
-rich -h
+rich --help
 ```
 
 ## Syntax highlighting
 
-To syntax highlight a file enter `rich` followed by the path to your file.
+To syntax highlight a file enter `rich` followed by the path to your file. Many file formats are supported!
 
 ```
 rich loop.py
 ```
 
-TODO: screenshot
+![syntax1](./imgs/syntax1.png)
 
 Add the `--line-number` or `-n` switch to enable line numbers. Add `--guides` or `-g` to enable indentation guides.
 
@@ -40,7 +40,7 @@ Add the `--line-number` or `-n` switch to enable line numbers. Add `--guides` or
 rich loop.py -n -g
 ```
 
-TODO: screenshot
+![syntax2](./imgs/syntax2.png)
 
 You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
 
@@ -48,11 +48,11 @@ You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
 rich loop.py --theme dracula
 ```
 
-By default, `rich` will wrap lines if they don't fit within the available width. You can disable this behaviour with `--no-wrap`.
+![syntax1](./imgs/syntax3.png)
 
-TODO: screenshot
+By default, `rich` will wrap lines if they don't fit within the available width. You can disable this behavior with `--no-wrap`.
 
-`Rich` will try to deduce the format of the via from the filename, if the chosen _lexer_ is wrong or you want to override the auto-detected lexer you can explicitly set it with the `--lexer` or `-x` switch.
+`Rich` will try to deduce the format of the via from the filename. If you want to override the auto-detected _lexer_ you can explicitly set it with the `--lexer` or `-x` switch.
 
 ## Markdown
 
@@ -62,7 +62,7 @@ You can request markdown rendering by adding the `--markdown` switch or `-m`.
 rich README.md -m
 ```
 
-TODO: screenshot
+![syntax1](./imgs/markdown1.png)
 
 If your terminal supports hyperlinks, you can add `--hyperlinks` or `-y` which will output hyperlinks rather than full URLs.
 
@@ -78,6 +78,8 @@ You can request JSON pretty formatting and highlighting with the `--json` or `-j
 rich cats.json --json
 ```
 
+![syntax1](./imgs/json1.png)
+
 ### Rules
 
 You can render a horizontal rule with `--rule` or `-u`. Specify a rule style with `--rule-style`. Set the character(s) to render the line with `--rule-char`.
@@ -88,7 +90,7 @@ rich "Hello [b]World[b]!" --rule --rule-style "red"
 rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 ```
 
-TODO: screenshot
+![syntax1](./imgs/rules1.png)
 
 ## Exporting
 
@@ -105,10 +107,10 @@ Nothing will be shown in the terminal, but you should find a "readme.html" in yo
 If you add the `--print` or `--p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
 
 ```
-rich "Hello, [bold magenta]World[/]!"
+rich "Hello, [bold magenta]World[/]!" --print
 ```
 
-TODO: screenshot
+![syntax1](./imgs/printing1.png)
 
 ### Soft wrapping
 
@@ -124,8 +126,6 @@ Note that when rich isn't writing directly to the terminal it will disable ansi 
 cat README.md | rich - --markdown --force-terminal
 ```
 
-TODO: screenshot
-
 ## General Options
 
 There are a number of additional switches you may add to modify the content rendered to the terminal. These options are universal and apply to all of the above features.
@@ -138,7 +138,7 @@ You can set a style to apply to the output with `--style` or `-s`. The styles ar
 rich "Hello, [b]World[/b]!" --print --style "on blue"
 ```
 
-TODO: screenshot
+![style1](./imgs/style1.png)
 
 ### Alignment
 
@@ -148,6 +148,8 @@ You can align output to the left, center, or right with the `--left`, `--center`
 rich "Hello [b]World[/b]!" --print --center
 ```
 
+![alignment1](./imgs/alignment1.png)
+
 ### Width
 
 You can set the width of the output with `--width` or `-w` and the desired width. Note that the default behavior is to wrap text.
@@ -156,7 +158,7 @@ You can set the width of the output with `--width` or `-w` and the desired width
 rich "I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration." -p -w 40
 ```
 
-TODO: screenshot
+![width](./imgs/width1.png)
 
 ### Text Justify
 
@@ -181,6 +183,8 @@ You can apply _padding_ around the output with `--padding` or `-d`.
 rich "Hello [b]World[/b]!" -p -c --padding 3 --style "on blue"
 ```
 
+![padding1](./imgs/padding1.png)
+
 ### Panel
 
 You can draw a _panel_ around content with `--panel` or `-a`, which takes one of a number of [styles](https://rich.readthedocs.io/en/latest/appendix/box.html).
@@ -188,3 +192,5 @@ You can draw a _panel_ around content with `--panel` or `-a`, which takes one of
 ```
 rich "Hello, [b]World[/b]!" -p -a heavy
 ```
+
+![panel1](./imgs/panel1.png)

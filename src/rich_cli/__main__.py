@@ -76,6 +76,23 @@ class ForceWidth:
         return Measurement(self.width, self.width)
 
 
+def blend_text(
+    message: str, color1: tuple[int, int, int], color2: tuple[int, int, int]
+) -> Text:
+    text = Text(message)
+    r1, g1, b1 = color1
+    r2, g2, b2 = color2
+    dr = r2 - r1
+    dg = g2 - g1
+    db = b2 - b1
+    size = len(text)
+    for index in range(size):
+        blend = index / size
+        color = f"#{int(r1 + dr * blend):2X}{int(g1 + dg * blend):2X}{int(b1 + db * blend):2X}"
+        text.stylize(color, index, index + 1)
+    return text
+
+
 class RichCommand(click.Command):
     def format_help(self, ctx, formatter):
 
@@ -102,7 +119,7 @@ class RichCommand(click.Command):
         )
 
         console.print(
-            f"[b]Rich CLI[/b] [cyan]v{VERSION}[/] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
+            f"[b]Rich CLI[/b] [magenta]v{VERSION}[/] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
             justify="center",
         )
 
@@ -144,7 +161,10 @@ class RichCommand(click.Command):
             )
         )
 
-        console.print("[dim]:heart: https://www.textualize.io", justify="right")
+        console.print(
+            blend_text("♥ https://www.textualize.io", (32, 32, 255), (255, 32, 255)),
+            justify="right",
+        )
 
 
 @click.command(cls=RichCommand)
@@ -242,7 +262,7 @@ class RichCommand(click.Command):
     "-S",
     default="",
     metavar="STYLE",
-    help="Set the panel style to [b]STYLE[/b] (required --panel).",
+    help="Set the panel style to [b]STYLE[/b] (requires --panel).",
 )
 @click.option(
     "--theme",
@@ -278,7 +298,6 @@ class RichCommand(click.Command):
 )
 @click.option(
     "--force-terminal",
-    "-f",
     default=None,
     help="Force terminal output when not writing to a terminal.",
 )
