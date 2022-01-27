@@ -100,7 +100,7 @@ In addition to rendering to the console, `rich` can write an HTML file. This wor
 rich README.md -o readme.html
 ```
 
-Nothing will be shown in the terminal, but you should find a "readme.html" in your current working directory.
+After running this command you should find a "readme.html" in your current working directory.
 
 ## Rich Printing
 
