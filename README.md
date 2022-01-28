@@ -92,6 +92,16 @@ rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 
 ![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rules1.png)
 
+## Network
+
+The `rich` command can read files from the internet you give it a URL starting with `http://` or `https://`.
+
+```
+rich https://raw.githubusercontent.com/Textualize/rich-cli/main/README.md --markdown
+```
+
+![network](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/network1.png)
+
 ## Exporting
 
 In addition to rendering to the console, `rich` can write an HTML file. This works with any command. Add `--export-html` or `-o` followed by the output path.
@@ -110,7 +120,7 @@ If you add the `--print` or `--p` option then Rich will treat the first argument
 rich "Hello, [bold magenta]World[/]!" --print
 ```
 
-![printin1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/printing1.png)
+![printing1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/printing1.png)
 
 ### Soft wrapping
 

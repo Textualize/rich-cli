@@ -1,5 +1,5 @@
 import sys
-from typing import NoReturn, Optional, List, TYPE_CHECKING
+from typing import NoReturn, Optional, Tuple, List, TYPE_CHECKING
 
 import click
 from rich.console import Console, RenderableType
@@ -28,6 +28,15 @@ BOXES = [
 
 BOX_TEXT = ", ".join(BOXES)
 
+COMMON_LEXERS = {
+    "html": "html",
+    "py": "python",
+    "md": "markdown",
+    "js": "javascript",
+    "xml": "xml",
+    "json": "json",
+}
+
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
     """Render an error message then exit the app."""
@@ -44,13 +53,45 @@ def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoRetu
     sys.exit(code)
 
 
-def read_resource(path: str) -> str:
+def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
     """Read a resource form a file or stdin."""
+
+    if path.startswith(("http://", "https://")):
+        import requests
+
+        response = requests.get(path)
+
+        text = response.text
+        try:
+            mime_type: str = response.headers["Content-Type"]
+            if ";" in mime_type:
+                mime_type = mime_type.split(";", 1)[0]
+        except KeyError:
+            pass
+        else:
+            if not lexer:
+                _, dot, ext = path.rpartition(".")
+                if dot and ext:
+                    ext = ext.lower()
+                    lexer = COMMON_LEXERS.get(ext, None)
+                if lexer is None:
+                    from pygments.lexers import get_lexer_for_mimetype
+
+                    try:
+                        lexer = get_lexer_for_mimetype(mime_type).name
+                    except Exception:
+                        pass
+        return (text, lexer)
     try:
         if path == "-":
-            return sys.stdin.read()
+            return (sys.stdin.read(), None)
         with open(path, "rt") as resource_file:
-            return resource_file.read()
+            text = resource_file.read()
+        if not lexer:
+            from pygments.lexers import guess_lexer_for_filename
+
+            lexer = guess_lexer_for_filename(path, text).name
+        return (text, lexer)
     except Exception as error:
         on_error(f"unable to read {escape(path)}", error)
 
@@ -130,7 +171,7 @@ class RichCommand(click.Command):
         )
 
         console.print(
-            "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH or TEXT or '-'>\n"
+            "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH,TEXT,URL, or '-'>\n"
         )
 
         options_table = Table(highlight=True, box=None, show_header=False)
@@ -287,7 +328,7 @@ class RichCommand(click.Command):
     "--lexer",
     "-x",
     metavar="LEXER",
-    default="default",
+    default=None,
     help="Use [b]LEXER[/b] for syntax highlighting. [dim]See https://pygments.org/docs/lexers/",
 )
 @click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
@@ -409,7 +450,7 @@ def main(
     elif json:
         from rich.json import JSON
 
-        json_data = read_resource(resource)
+        json_data, _lexer = read_resource(resource, lexer)
         try:
             renderable = JSON(json_data)
         except Exception as error:
@@ -418,7 +459,7 @@ def main(
     elif markdown:
         from rich.markdown import Markdown
 
-        markdown_data = read_resource(resource)
+        markdown_data, lexer = read_resource(resource, lexer)
         renderable = Markdown(markdown_data, hyperlinks=hyperlinks)
 
     else:
@@ -427,30 +468,22 @@ def main(
 
         try:
             if resource == "-":
-                string = sys.stdin.read()
-                num_lines = len(string.splitlines())
-                line_range = _line_range(head, tail, num_lines)
-                renderable = Syntax(
-                    string,
-                    lexer,
-                    theme=theme,
-                    line_numbers=line_numbers,
-                    indent_guides=guides,
-                    word_wrap=not no_wrap,
-                    line_range=line_range,
-                )
+                code = sys.stdin.read()
             else:
-                num_lines = len(read_resource(resource).splitlines())
-                line_range = _line_range(head, tail, num_lines)
+                code, lexer = read_resource(resource, lexer)
 
-                renderable = Syntax.from_path(
-                    resource,
-                    theme=theme,
-                    line_numbers=line_numbers,
-                    indent_guides=guides,
-                    word_wrap=not no_wrap,
-                    line_range=line_range,
-                )
+            num_lines = len(code.splitlines())
+            line_range = _line_range(head, tail, num_lines)
+            renderable = Syntax(
+                code,
+                lexer,
+                theme=theme,
+                line_numbers=line_numbers,
+                indent_guides=guides,
+                word_wrap=not no_wrap,
+                line_range=line_range,
+            )
+
         except Exception as error:
             on_error("unable to read file", error)
 

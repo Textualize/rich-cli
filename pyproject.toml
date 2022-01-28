@@ -8,7 +8,8 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.6.2"
 rich = "^11.0.0"
-click = "^8.0.3"
+click = "^8.0.0"
+requests = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
