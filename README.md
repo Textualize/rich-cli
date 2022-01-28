@@ -94,13 +94,13 @@ rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 
 ## Network
 
-The `rich` command read files via a url if the first argument starts with `http://` or `https://`:
+The `rich` command can read files from the internet you give it a URL starting with `http://` or `https://`.
 
 ```
 rich https://raw.githubusercontent.com/Textualize/rich-cli/main/README.md --markdown
 ```
 
-![netowork](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/network1.png)
+![network](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/network1.png)
 
 ## Exporting
 
