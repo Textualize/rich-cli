@@ -35,6 +35,7 @@ COMMON_LEXERS = {
     "js": "javascript",
     "xml": "xml",
     "json": "json",
+    "toml": "toml",
 }
 
 
@@ -85,8 +86,14 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
     try:
         if path == "-":
             return (sys.stdin.read(), None)
+
         with open(path, "rt") as resource_file:
             text = resource_file.read()
+        if not lexer:
+            _, dot, ext = path.rpartition(".")
+            if dot and ext:
+                ext = ext.lower()
+                lexer = COMMON_LEXERS.get(ext, None)
         if not lexer:
             from pygments.lexers import guess_lexer_for_filename
 
