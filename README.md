@@ -92,6 +92,16 @@ rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 
 ![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rules1.png)
 
+## Network
+
+The `rich` command read files via a url if the first argument starts with `http://` or `https://`:
+
+```
+rich https://raw.githubusercontent.com/Textualize/rich-cli/main/README.md --markdown
+```
+
+![netowork](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/network1.png)
+
 ## Exporting
 
 In addition to rendering to the console, `rich` can write an HTML file. This works with any command. Add `--export-html` or `-o` followed by the output path.
