@@ -429,10 +429,13 @@ def main(
         elif text_full:
             justify = "full"
 
-        if resource == "-":
-            resource = Text(sys.stdin.read(), justify=justify, no_wrap=no_wrap)
         try:
-            renderable = Text.from_markup(resource, justify=justify, emoji=emoji)
+            if resource == "-":
+                renderable = Text.from_markup(
+                    sys.stdin.read(), justify=justify, emoji=emoji
+                )
+            else:
+                renderable = Text.from_markup(resource, justify=justify, emoji=emoji)
             renderable.no_wrap = no_wrap
 
         except Exception as error:
