@@ -120,7 +120,7 @@ If you add the `--print` or `--p` option then Rich will treat the first argument
 rich "Hello, [bold magenta]World[/]!" --print
 ```
 
-![printin1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/printing1.png)
+![printing1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/printing1.png)
 
 ### Soft wrapping
 
