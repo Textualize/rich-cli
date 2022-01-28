@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 from typing import NoReturn, Optional, Tuple, List, TYPE_CHECKING
 
@@ -125,7 +127,7 @@ class ForceWidth:
 
 
 def blend_text(
-    message: str, color1: tuple[int, int, int], color2: tuple[int, int, int]
+    message: str, color1: Tuple[int, int, int], color2: Tuple[int, int, int]
 ) -> Text:
     """Blend text from one color to another."""
     text = Text(message)
