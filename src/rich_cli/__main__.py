@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from contextlib import contextmanager
 from io import StringIO
 from typing import (
     NoReturn,
@@ -9,10 +10,11 @@ from typing import (
     List,
     TYPE_CHECKING,
     Sequence,
+    Iterator,
 )
 
 import click
-from rich.console import Console, RenderableType
+from rich.console import Console, RenderableType, Group
 from rich.highlighter import RegexHighlighter
 from rich.markup import escape
 from rich.padding import Padding
@@ -174,6 +176,7 @@ class RichHelpFormatter(click.HelpFormatter):
             indent_increment=indent_increment, width=width, max_width=max_width
         )
 
+        self.render_list: Optional[List[RenderableType]] = None
         self.string_buffer = StringIO()
         self.console = Console(
             file=self.string_buffer,
@@ -203,10 +206,16 @@ class RichHelpFormatter(click.HelpFormatter):
         return self.string_buffer.getvalue()
 
     def write(self, string: RenderableType, **kwargs) -> None:
-        self.console.print(string, end="", **kwargs)
+        if self.render_list is not None:
+            self.render_list.append(string)
+        else:
+            self.console.print(string, end="", **kwargs)
 
-    def write_text(self, text: str) -> None:
-        self.console.print(Padding.indent(text, level=self.current_indent))
+    def write_text(self, text: RenderableType) -> None:
+        if self.render_list is not None:
+            self.render_list.append(text)
+        else:
+            self.console.print(Padding.indent(text, level=self.current_indent))
 
     def write_dl(
         self,
@@ -218,9 +227,29 @@ class RichHelpFormatter(click.HelpFormatter):
         for row in rows:
             table.add_row(*row)
 
-        self.console.print(
-            Panel(table, border_style="dim", title="", title_align="left")
-        )
+        self.write(table)
+
+    @contextmanager
+    def section(self, name: str) -> Iterator[None]:
+        """Display a section inside of a panel."""
+
+        if self.render_list is not None:
+            raise RuntimeError("section context manager may not be nested")
+
+        self.write_paragraph()
+        self.render_list = []
+        try:
+            yield
+        finally:
+            self.console.print(
+                Panel(
+                    Group(*self.render_list),
+                    border_style="dim",
+                    title=name,
+                    title_align="left",
+                )
+            )
+            self.render_list = None
 
 
 click.Context.formatter_class = RichHelpFormatter
