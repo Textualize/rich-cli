@@ -1,13 +1,25 @@
 from __future__ import annotations
 
 import sys
-from typing import NoReturn, Optional, Tuple, List, TYPE_CHECKING
+from io import StringIO
+from typing import (
+    NoReturn,
+    Optional,
+    Tuple,
+    List,
+    TYPE_CHECKING,
+    Sequence,
+)
 
 import click
 from rich.console import Console, RenderableType
-
+from rich.highlighter import RegexHighlighter
 from rich.markup import escape
+from rich.padding import Padding
+from rich.panel import Panel
+from rich.table import Table
 from rich.text import Text
+from rich.theme import Theme
 
 console = Console()
 error_console = Console(stderr=True)
@@ -144,81 +156,95 @@ def blend_text(
     return text
 
 
-class RichCommand(click.Command):
-    """Override Clicks help with a Richer version."""
+class OptionHighlighter(RegexHighlighter):
+    highlights = [
+        r"(?P<switch>\-\w)",
+        r"(?P<option>\-\-[\w\-]+)",
+    ]
 
-    # TODO: Extract this in to a general tool, i.e. rich-click
 
-    def format_help(self, ctx, formatter):
+class RichHelpFormatter(click.HelpFormatter):
+    def __init__(
+        self,
+        indent_increment: int = 2,
+        width: Optional[int] = None,
+        max_width: Optional[int] = None,
+    ) -> None:
+        super().__init__(
+            indent_increment=indent_increment, width=width, max_width=max_width
+        )
 
-        from rich.highlighter import RegexHighlighter
-        from rich.panel import Panel
-        from rich.table import Table
-        from rich.theme import Theme
-
-        class OptionHighlighter(RegexHighlighter):
-            highlights = [
-                r"(?P<switch>\-\w)",
-                r"(?P<option>\-\-[\w\-]+)",
-            ]
-
-        highlighter = OptionHighlighter()
-
-        console = Console(
+        self.string_buffer = StringIO()
+        self.console = Console(
+            file=self.string_buffer,
+            force_terminal=True,
             theme=Theme(
                 {
                     "option": "bold cyan",
                     "switch": "bold green",
                 }
             ),
-            highlighter=highlighter,
+            highlighter=OptionHighlighter(),
         )
 
-        console.print(
+    # at least click.HelpFormatter.write_paragraph() checks the content of the buffer
+    @property
+    def buffer(self) -> List[str]:
+        return self.string_buffer.getvalue().splitlines()
+
+    # make click.HelpFormatter.__init__() happy
+    # TODO: should it actually set the content of self.string_buffer?
+    @buffer.setter
+    def buffer(self, value: List[str]):
+        pass
+
+    def getvalue(self) -> str:
+        """Returns the buffer contents."""
+        return self.string_buffer.getvalue()
+
+    def write(self, string: RenderableType, **kwargs) -> None:
+        self.console.print(string, end="", **kwargs)
+
+    def write_text(self, text: str) -> None:
+        self.console.print(Padding.indent(text, level=self.current_indent))
+
+    def write_dl(
+        self,
+        rows: Sequence[Tuple[str, str]],
+        col_max: int = 30,
+        col_spacing: int = 2,
+    ) -> None:
+        table = Table(highlight=True, box=None, show_header=False)
+        for row in rows:
+            table.add_row(*row)
+
+        self.console.print(
+            Panel(table, border_style="dim", title="", title_align="left")
+        )
+
+
+click.Context.formatter_class = RichHelpFormatter
+
+
+class RichCommand(click.Command):
+    """Override Clicks help with a Richer version."""
+
+    # TODO: Extract this in to a general tool, i.e. rich-click
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.epilog = blend_text(
+            "♥ https://www.textualize.io", (32, 32, 255), (255, 32, 255)
+        )
+
+    def format_help(self, ctx, formatter: RichHelpFormatter):
+        formatter.write(
             f"[b]Rich CLI[/b] [magenta]v{VERSION}[/] 🤑\n\n[dim]Rich text and formatting in the terminal\n",
             justify="center",
         )
 
-        console.print(
-            "Usage: [b]rich[/b] [b][OPTIONS][/] [b cyan]<PATH,TEXT,URL, or '-'>\n"
-        )
-
-        options_table = Table(highlight=True, box=None, show_header=False)
-
-        for param in self.get_params(ctx)[1:]:
-
-            if len(param.opts) == 2:
-                opt1 = highlighter(param.opts[1])
-                opt2 = highlighter(param.opts[0])
-            else:
-                opt2 = highlighter(param.opts[0])
-                opt1 = Text("")
-
-            if param.metavar:
-                opt2 += Text(f" {param.metavar}", style="bold yellow")
-
-            options = Text(" ".join(reversed(param.opts)))
-            help_record = param.get_help_record(ctx)
-            if help_record is None:
-                help = ""
-            else:
-                help = Text.from_markup(param.get_help_record(ctx)[-1], emoji=False)
-
-            if param.metavar:
-                options += f" {param.metavar}"
-
-            options_table.add_row(opt1, opt2, highlighter(help))
-
-        console.print(
-            Panel(
-                options_table, border_style="dim", title="Options", title_align="left"
-            )
-        )
-
-        console.print(
-            blend_text("♥ https://www.textualize.io", (32, 32, 255), (255, 32, 255)),
-            justify="right",
-        )
+        super().format_help(ctx, formatter)
 
 
 @click.command(cls=RichCommand)
