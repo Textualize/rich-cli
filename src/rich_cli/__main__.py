@@ -1,5 +1,4 @@
 import sys
-from importlib.metadata import version
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
 import click
@@ -36,7 +35,7 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = version("rich_cli")
+VERSION = "1.2.2"
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
