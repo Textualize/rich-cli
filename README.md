@@ -4,6 +4,8 @@ Rich-cli is a command line toolbox for fancy output in the terminal, built with 
 
 Rich-cli can syntax highlight a large number of file types in the terminal, with specialized rendering for Markdown and JSON files. The `rich` command also provides an interface to console text rendering with many options to format and style your output.
 
+![splash image](./imgs/rich-cli-splash.jpg)
+
 ## Installation
 
 Rich-cli is distributed as a Python application, which you can install via Pip:
