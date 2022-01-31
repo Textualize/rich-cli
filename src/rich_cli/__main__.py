@@ -7,8 +7,6 @@ from rich.console import Console, RenderableType
 from rich.markup import escape
 from rich.text import Text
 
-from .win_vt import enable_windows_virtual_terminal_processing
-
 console = Console()
 error_console = Console(stderr=True)
 
@@ -575,7 +573,6 @@ def _line_range(
     return line_range
 
 
-@enable_windows_virtual_terminal_processing()
 def run():
     main()
 
