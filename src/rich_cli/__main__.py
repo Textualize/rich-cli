@@ -1,13 +1,13 @@
-from __future__ import annotations
-
 import sys
-from typing import NoReturn, Optional, Tuple, List, TYPE_CHECKING
+from importlib.metadata import version
+from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
 import click
 from rich.console import Console, RenderableType
-
 from rich.markup import escape
 from rich.text import Text
+
+from .win_vt import enable_windows_virtual_terminal_processing
 
 console = Console()
 error_console = Console(stderr=True)
@@ -15,8 +15,6 @@ error_console = Console(stderr=True)
 if TYPE_CHECKING:
     from rich.console import ConsoleOptions, RenderResult
     from rich.measure import Measurement
-
-VERSION = "1.0"
 
 BOXES = [
     "none",
@@ -28,7 +26,7 @@ BOXES = [
     "double",
 ]
 
-BOX_TEXT = ", ".join(BOXES)
+BOX_TEXT = ", ".join(sorted(BOXES))
 
 COMMON_LEXERS = {
     "html": "html",
@@ -39,6 +37,8 @@ COMMON_LEXERS = {
     "json": "json",
     "toml": "toml",
 }
+
+VERSION = version("rich_cli")
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
@@ -559,7 +559,9 @@ def main(
             on_error("failed to save HTML", error)
 
 
-def _line_range(head, tail, num_lines):
+def _line_range(
+    head: Optional[int], tail: Optional[int], num_lines: int
+) -> Optional[Tuple[int, int]]:
     if head and tail:
         on_error("cannot specify both head and tail")
     if head:
@@ -573,6 +575,7 @@ def _line_range(head, tail, num_lines):
     return line_range
 
 
+@enable_windows_virtual_terminal_processing()
 def run():
     main()
 
