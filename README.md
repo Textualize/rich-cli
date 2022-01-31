@@ -8,7 +8,7 @@ Use the `rich` command to highlight a large number of file types in the terminal
 
 ## Installation
 
-Rich-cli is distributed as a Python application, which you can install via Pip:
+Rich-cli is distributed as a Python application, which you can install with Pip:
 
 ```
 python -m pip install rich-cli
