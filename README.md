@@ -46,7 +46,7 @@ rich loop.py -n -g
 
 ![syntax2](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax2.png)
 
-You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
+You can specify a [theme](https://pygments.org/styles/) with `--theme`.
 
 ```
 rich loop.py --theme dracula
