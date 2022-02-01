@@ -26,7 +26,7 @@ Once installed, you should have the `rich` command on your path.
 rich --help
 ```
 
-ℹ️ More information methods coming soon.
+ℹ️ More installation methods coming soon.
 
 ## Syntax highlighting
 
