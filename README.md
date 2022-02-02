@@ -2,11 +2,13 @@
 
 Rich-cli is a command line toolbox for fancy output in the terminal, built with [Rich](https://github.com/Textualize/rich).
 
-Rich-cli can syntax highlight a large number of file types in the terminal, with specialized rendering for Markdown and JSON files. The `rich` command also provides an interface to console text rendering with many options to format and style your output.
+Use the `rich` command to highlight a variety of file types in the terminal, with specialized rendering for Markdown and JSON files. Additionally you can markup and format text from the command line.
+
+![splash image](./imgs/rich-cli-splash.jpg)
 
 ## Installation
 
-Rich-cli is distributed as a Python application, which you can install via Pip:
+Rich-cli is distributed as a Python application, which you can install with Pip:
 
 ```
 python -m pip install rich-cli
@@ -24,9 +26,11 @@ Once installed, you should have the `rich` command on your path.
 rich --help
 ```
 
+ℹ️ More installation methods coming soon.
+
 ## Syntax highlighting
 
-To syntax highlight a file enter `rich` followed by the path to your file. Many file formats are supported!
+To syntax highlight a file enter `rich` followed by a path. Many file formats are supported.
 
 ```
 rich loop.py
@@ -42,7 +46,7 @@ rich loop.py -n -g
 
 ![syntax2](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax2.png)
 
-You can specify a [theme](https://pygments.org/styles/) with `--theme` or `-t`.
+You can specify a [theme](https://pygments.org/styles/) with `--theme`.
 
 ```
 rich loop.py --theme dracula

@@ -2,6 +2,8 @@ import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
 import click
+from pygments.lexers.special import TextLexer
+from pygments.util import ClassNotFound
 from rich.console import Console, RenderableType
 from rich.markup import escape
 from rich.text import Text
@@ -98,6 +100,8 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
 
             lexer = guess_lexer_for_filename(path, text).name
         return (text, lexer)
+    except ClassNotFound:
+        return (text, TextLexer())
     except Exception as error:
         on_error(f"unable to read {escape(path)}", error)
 
