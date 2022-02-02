@@ -349,7 +349,7 @@ class RichCommand(click.Command):
 )
 @click.option(
     "--force-terminal",
-    default=None,
+    is_flag=True,
     help="Force terminal output when not writing to a terminal.",
 )
 @click.option(
@@ -393,12 +393,14 @@ def main(
     guides: bool = False,
     lexer: str = "",
     hyperlinks: bool = False,
-    force_terminal: Optional[bool] = None,
+    force_terminal: bool = False,
     export_html: Optional[str] = None,
 ):
     """Rich toolbox for console output."""
     console = Console(
-        emoji=emoji, record=bool(export_html), force_terminal=force_terminal
+        emoji=emoji,
+        record=bool(export_html),
+        force_terminal=force_terminal if force_terminal else None,
     )
 
     if width > 0:
