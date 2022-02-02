@@ -89,9 +89,9 @@ rich cats.json --json
 You can render a horizontal rule with `--rule` or `-u`. Specify a rule style with `--rule-style`. Set the character(s) to render the line with `--rule-char`.
 
 ```
-rich "Hello [b]World[b]!" --rule
-rich "Hello [b]World[b]!" --rule --rule-style "red"
-rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
+rich "Hello [b]World[/b]!" --rule
+rich "Hello [b]World[/b]!" --rule --rule-style "red"
+rich "Hello [b]World[/b]!" --rule --rule-style "red" --rule-char "="
 ```
 
 ![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rules1.png)
