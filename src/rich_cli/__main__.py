@@ -2,7 +2,6 @@ import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
 import click
-from pygments.lexers.special import TextLexer
 from pygments.util import ClassNotFound
 from rich.console import Console, RenderableType
 from rich.markup import escape
@@ -37,7 +36,7 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.2.2"
+VERSION = "1.3.0"
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
@@ -98,10 +97,11 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
         if not lexer:
             from pygments.lexers import guess_lexer_for_filename
 
-            lexer = guess_lexer_for_filename(path, text).name
+            try:
+                lexer = guess_lexer_for_filename(path, text).name
+            except ClassNotFound:
+                return (text, "text")
         return (text, lexer)
-    except ClassNotFound:
-        return (text, TextLexer())
     except Exception as error:
         on_error(f"unable to read {escape(path)}", error)
 
@@ -363,6 +363,7 @@ class RichCommand(click.Command):
     default="",
     help="Write HTML to [b]PATH[/b].",
 )
+@click.option("--pager", is_flag=True, help="Display in an interactive pager.")
 def main(
     resource: str,
     print: bool = False,
@@ -399,6 +400,7 @@ def main(
     hyperlinks: bool = False,
     force_terminal: bool = False,
     export_html: Optional[str] = None,
+    pager: bool = False,
 ):
     """Rich toolbox for console output."""
     console = Console(
@@ -548,12 +550,18 @@ def main(
     elif center:
         justify = "center"
 
-    console.print(
-        renderable,
-        width=None if max_width <= 0 else max_width,
-        justify=justify,
-        soft_wrap=soft,
-    )
+    if pager:
+        from .pager import PagerApp
+
+        PagerApp.run(title=resource, content=renderable)
+
+    else:
+        console.print(
+            renderable,
+            width=None if max_width <= 0 else max_width,
+            justify=justify,
+            soft_wrap=soft,
+        )
 
     if export_html:
         try:

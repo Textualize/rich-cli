@@ -96,6 +96,12 @@ rich "Hello [b]World[b]!" --rule --rule-style "red" --rule-char "="
 
 ![syntax1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rules1.png)
 
+## Pager
+
+Add `--pager` to display the content with a built in pager application.
+
+Scroll the pager with cursor keys, page up/down, home, end. Alternatively use the scrollbar which will be visible to the right of the terminal.
+
 ## Network
 
 The `rich` command can read files from the internet you give it a URL starting with `http://` or `https://`.
