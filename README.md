@@ -4,7 +4,7 @@ Rich-cli is a command line toolbox for fancy output in the terminal, built with 
 
 Use the `rich` command to highlight a variety of file types in the terminal, with specialized rendering for Markdown and JSON files. Additionally you can markup and format text from the command line.
 
-![splash image](./imgs/rich-cli-splash.jpg)
+![splash image](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rich-cli-splash.jpg)
 
 ## Installation
 
