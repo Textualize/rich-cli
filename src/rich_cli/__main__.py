@@ -1,3 +1,4 @@
+from operator import itemgetter
 import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
@@ -36,7 +37,18 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.3.0"
+VERSION = "1.4.0"
+
+
+AUTO = 0
+SYNTAX = 1
+PRINT = 2
+MARKDOWN = 3
+RST = 4
+JSON = 5
+RULE = 6
+INSPECT = 7
+CSV = 8
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
@@ -56,6 +68,8 @@ def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoRetu
 
 def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
     """Read a resource form a file or stdin."""
+    if not path:
+        on_error("missing path or URL")
 
     if path.startswith(("http://", "https://")):
         import requests
@@ -223,23 +237,28 @@ class RichCommand(click.Command):
 
 
 @click.command(cls=RichCommand)
-@click.argument("resource", metavar="<PATH or TEXT or '-'>")
+@click.argument("resource", metavar="<PATH or TEXT or '-'>", default="")
 @click.option(
     "--print",
     "-p",
+    "_print",
     is_flag=True,
     help="Print [u]console markup[/u]. [dim]See https://rich.readthedocs.io/en/latest/markup.html",
 )
 @click.option("--rule", "-u", is_flag=True, help="Display a horizontal [u]rule[/u].")
 @click.option("--json", "-j", is_flag=True, help="Display as [u]JSON[/u].")
 @click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
+@click.option("--rst", is_flag=True, help="Display [u]restructured text[/u].")
+@click.option("--csv", is_flag=True, help="Display [u]CSV[/u] as a table.")
+@click.option("--syntax", is_flag=True, help="[u]Syntax[/u] highlighting.")
+@click.option("--inspect", is_flag=True, help="[u]Inspect[/u] a python object.")
 @click.option(
     "--head",
     "-h",
     type=click.IntRange(min=1),
     metavar="LINES",
     default=None,
-    help="Display first [b]LINES[/] of the file.",
+    help="Display first [b]LINES[/] of the file (requires --syntax or --csv).",
 )
 @click.option(
     "--tail",
@@ -247,7 +266,7 @@ class RichCommand(click.Command):
     type=click.IntRange(min=1),
     metavar="LINES",
     default=None,
-    help="Display last [b]LINES[/] of the file.",
+    help="Display last [b]LINES[/] of the file (requires --syntax or --csv).",
 )
 @click.option(
     "--emoji", "-j", is_flag=True, help="Enable emoji code. [dim]e.g. :sparkle:"
@@ -324,6 +343,7 @@ class RichCommand(click.Command):
     metavar="THEME",
     help="Set syntax theme to [b]THEME[/b]. [dim]See https://pygments.org/styles/",
     default="ansi_dark",
+    envvar="RICH_THEME",
 )
 @click.option(
     "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
@@ -364,13 +384,19 @@ class RichCommand(click.Command):
     help="Write HTML to [b]PATH[/b].",
 )
 @click.option("--pager", is_flag=True, help="Display in an interactive pager.")
+@click.option("--version", "-v", is_flag=True, help="Print version and exit.")
 def main(
     resource: str,
-    print: bool = False,
+    version: bool = False,
+    _print: bool = False,
+    syntax: bool = False,
     rule: bool = False,
     rule_char: Optional[str] = None,
     json: bool = False,
     markdown: bool = False,
+    rst: bool = False,
+    csv: bool = False,
+    inspect: bool = True,
     emoji: bool = False,
     left: bool = False,
     right: bool = False,
@@ -403,11 +429,22 @@ def main(
     pager: bool = False,
 ):
     """Rich toolbox for console output."""
+    if version:
+        sys.stdout.write(f"{VERSION}\n")
+        return
     console = Console(
         emoji=emoji,
         record=bool(export_html),
         force_terminal=force_terminal if force_terminal else None,
     )
+
+    def print_usage() -> None:
+        console.print(
+            r"Usage: [b]rich [OPTIONS][/b] [b cyan]<PATH,TEXT,URL, or '-'>[/]"
+        )
+        console.print("See [bold green]rich --help[/] for options")
+        console.print()
+        sys.exit(0)
 
     if width > 0:
         expand = True
@@ -423,7 +460,54 @@ def main(
                 on_error(f"padding should be 1, 2 or 4 integers separated by commas")
 
     renderable: RenderableType = ""
-    if print or rule:
+
+    resource_format = AUTO
+    if _print:
+        resource_format = PRINT
+    elif syntax:
+        resource_format = SYNTAX
+    elif json:
+        resource_format = JSON
+    elif markdown:
+        resource_format = MARKDOWN
+    elif rule:
+        resource_format = RULE
+    elif inspect:
+        resource_format = INSPECT
+    elif csv:
+        resource_format = CSV
+    elif rst:
+        resource_format = RST
+
+    if resource_format == AUTO and "." in resource:
+        import os.path
+
+        ext = ""
+        if resource.startswith(("http://", "https://")):
+            from urllib.parse import urlparse
+
+            try:
+                path = urlparse(resource).path
+            except Exception:
+                pass
+            else:
+                ext = os.path.splitext(path)[-1].lower()
+        else:
+            ext = os.path.splitext(resource)[-1].lower()
+
+        if ext == ".md":
+            resource_format = MARKDOWN
+        elif ext == ".json":
+            resource_format = JSON
+        elif ext in (".csv", ".tsv"):
+            resource_format = CSV
+        elif ext == ".rst":
+            resource_format = RST
+
+    if resource_format == AUTO:
+        resource_format = SYNTAX
+
+    if resource_format in (PRINT, RULE):
         from rich.text import Text
 
         justify = "default"
@@ -464,23 +548,47 @@ def main(
                 align="center" if justify in ("full", "default") else justify,
             )
 
-    elif json:
-        from rich.json import JSON
+    elif resource_format == JSON:
+        from rich.json import JSON as RichJSON
 
         json_data, _lexer = read_resource(resource, lexer)
         try:
-            renderable = JSON(json_data)
+            renderable = RichJSON(json_data)
         except Exception as error:
             on_error("unable to read json", error)
 
-    elif markdown:
+    elif resource_format == MARKDOWN:
         from rich.markdown import Markdown
 
         markdown_data, lexer = read_resource(resource, lexer)
         renderable = Markdown(markdown_data, hyperlinks=hyperlinks)
 
-    else:
+    elif resource_format == RST:
+        from rich_rst import RestructuredText
 
+        rst_data, lexter = read_resource(resource, lexer)
+        renderable = RestructuredText(rst_data)
+
+    elif resource_format == INSPECT:
+        try:
+            inspect_data = eval(resource)
+        except Exception:
+            console.print_exception()
+            on_error(f"unable to eval {resource!r}")
+
+        from rich._inspect import Inspect
+
+        renderable = Inspect(
+            inspect_data, help=False, dunder=False, all=False, methods=True
+        )
+
+    elif resource_format == CSV:
+
+        renderable = render_csv(resource, head, tail)
+
+    else:
+        if not resource:
+            print_usage()
         from rich.syntax import Syntax
 
         try:
@@ -539,7 +647,7 @@ def main(
         else:
             renderable = Styled(renderable, text_style)
 
-    if width > 0:
+    if width > 0 and not pager:
         renderable = ForceWidth(renderable, width=width)
 
     justify = "default"
@@ -551,23 +659,101 @@ def main(
         justify = "center"
 
     if pager:
-        from .pager import PagerApp
+        if justify != "default":
+            from rich.align import Align
 
-        PagerApp.run(title=resource, content=renderable)
+            renderable = Align(renderable, justify)
+
+        from .pager import PagerApp, PagerRenderable
+
+        if width < 0:
+            width = console.width
+        render_options = console.options.update(width=width - 1)
+        lines = console.render_lines(renderable, render_options, new_lines=True)
+        PagerApp.run(title=resource, content=PagerRenderable(lines, width=width))
 
     else:
-        console.print(
-            renderable,
-            width=None if max_width <= 0 else max_width,
-            justify=justify,
-            soft_wrap=soft,
-        )
+        try:
+            console.print(
+                renderable,
+                width=None if max_width <= 0 else max_width,
+                soft_wrap=soft,
+            )
+        except Exception as error:
+            on_error("failed to print resource", error)
 
     if export_html:
         try:
             console.save_html(export_html)
         except Exception as error:
             on_error("failed to save HTML", error)
+
+
+def render_csv(
+    resource: str, head: Optional[int] = None, tail: Optional[int] = None
+) -> RenderableType:
+    """Render resource as CSV.
+
+    Args:
+        resource (str): Resource string.
+
+    Returns:
+        RenderableType: Table renderable.
+    """
+    import io
+    import csv
+    import re
+    from rich import box
+    from rich.table import Table
+    from operator import itemgetter
+
+    is_number = re.compile(r"\-?[0-9]*?\.?[0-9]*?").fullmatch
+
+    csv_data, _ = read_resource(resource, "csv")
+    sniffer = csv.Sniffer()
+    try:
+        dialect = sniffer.sniff(csv_data[:1024])
+        has_header = sniffer.has_header(csv_data[:1024])
+    except Exception as error:
+        on_error(str(error))
+
+    csv_file = io.StringIO(csv_data)
+    reader = csv.reader(csv_file, dialect=dialect)
+
+    table = Table(
+        show_header=has_header,
+        box=box.HEAVY_HEAD if has_header else box.SQUARE,
+        border_style="blue",
+    )
+    rows = iter(reader)
+    if has_header:
+        header = next(rows)
+        for column in header:
+            table.add_column(column)
+
+    table_rows = [row for row in rows if row]
+    if head is not None:
+        table_rows = table_rows[:head]
+    elif tail is not None:
+        table_rows = table_rows[-tail:]
+    for row in table_rows:
+        if row:
+            table.add_row(*row)
+
+    for index, table_column in enumerate(table.columns):
+        get_index = itemgetter(index)
+
+        for row in table_rows:
+            value = get_index(row)
+            if value and not is_number(value):
+
+                break
+        else:
+            table_column.justify = "right"
+            table_column.style = "bold green"
+            table_column.header_style = "bold green"
+
+    return table
 
 
 def _line_range(

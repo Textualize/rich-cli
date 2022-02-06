@@ -52,6 +52,12 @@ You can specify a [theme](https://pygments.org/styles/) with `--theme`.
 rich loop.py --theme dracula
 ```
 
+You can set the default theme via the `RICH_THEME` environment variable. So the following is equivalent to the above command:
+
+```
+RICH_THEME=dracula rich loop.py
+```
+
 ![syntax3](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/syntax3.png)
 
 By default, `rich` will wrap lines if they don't fit within the available width. You can disable this behavior with `--no-wrap`.
@@ -60,10 +66,10 @@ By default, `rich` will wrap lines if they don't fit within the available width.
 
 ## Markdown
 
-You can request markdown rendering by adding the `--markdown` switch or `-m`.
+You can request markdown rendering by adding the `--markdown` switch or `-m`. If the file ends with `.md` markdown will be auto-detected.
 
 ```
-rich README.md -m
+rich README.md
 ```
 
 ![markdown1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/markdown1.png)
@@ -76,13 +82,23 @@ rich README.md --hyperlinks
 
 ## JSON
 
-You can request JSON pretty formatting and highlighting with the `--json` or `-j` switches.
+You can request JSON pretty formatting and highlighting with the `--json` or `-j` switches. If the file ends with `.json` then JSON will be auto-detected.
 
 ```
-rich cats.json --json
+rich cats.json
 ```
 
 ![json1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/json1.png)
+
+## CSV
+
+Rich can display the contents of a CSV (or TSV) as a table. If the file ends with `.csv` or `.tsv` then JSON will be auto-detected.
+
+```
+rich deniro.csv
+```
+
+![csv1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/csv1.png)
 
 ### Rules
 
