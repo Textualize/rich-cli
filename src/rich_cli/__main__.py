@@ -744,9 +744,11 @@ def render_csv(
         get_index = itemgetter(index)
 
         for row in table_rows:
-            value = get_index(row)
-            if value and not is_number(value):
-
+            try:
+                value = get_index(row)
+                if value and not is_number(value):
+                    break
+            except Exception:
                 break
         else:
             table_column.justify = "right"
