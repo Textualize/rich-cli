@@ -584,7 +584,7 @@ def main(
 
     elif resource_format == CSV:
 
-        renderable = render_csv(resource, head, tail)
+        renderable = render_csv(resource, head, tail, title, caption)
 
     else:
         if not resource:
@@ -678,6 +678,7 @@ def main(
                 renderable,
                 width=None if max_width <= 0 else max_width,
                 soft_wrap=soft,
+                justify=justify,
             )
         except Exception as error:
             on_error("failed to print resource", error)
@@ -690,7 +691,11 @@ def main(
 
 
 def render_csv(
-    resource: str, head: Optional[int] = None, tail: Optional[int] = None
+    resource: str,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
+    title: Optional[str] = None,
+    caption: Optional[str] = None,
 ) -> RenderableType:
     """Render resource as CSV.
 
@@ -724,6 +729,9 @@ def render_csv(
         show_header=has_header,
         box=box.HEAVY_HEAD if has_header else box.SQUARE,
         border_style="blue",
+        title=title,
+        caption=caption,
+        caption_justify="right",
     )
     rows = iter(reader)
     if has_header:
