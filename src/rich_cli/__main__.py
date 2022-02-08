@@ -567,7 +567,7 @@ def main(
         from rich_rst import RestructuredText
 
         rst_data, lexter = read_resource(resource, lexer)
-        renderable = RestructuredText(rst_data)
+        renderable = RestructuredText(rst_data, show_errors=False)
 
     elif resource_format == INSPECT:
         try:
