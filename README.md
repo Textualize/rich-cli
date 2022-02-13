@@ -8,25 +8,42 @@ Use the `rich` command to highlight a variety of file types in the terminal, wit
 
 ## Installation
 
-Rich-cli is distributed as a Python application, which you can install with Pip:
+There are a few options for installing Rich-CLI.
 
-```
-python -m pip install rich-cli
-```
+### Windows / Linux
 
-Alternatively, you can use `pipx` to install it globally:
+You can install Rich-CLI with [pipx](https://pypa.github.io/pipx/).
 
 ```
 pipx install rich-cli
 ```
 
-Once installed, you should have the `rich` command on your path.
+### MacOS
+
+You can install Rich-CLI with [Homebew](https://brew.sh/).
+
+```
+brew tap textualize/rich
+brew install rich
+```
+
+### Universal
+
+Rich-CLI may be installed as a Python package.
+
+ℹ️ It is reccomended to create a *virtual environment* first, to avoid any dependency conflicts.
+
+```
+python -m pip install rich-cli
+```
+
+## Rich command
+
+Once installed you should have the `rich` command in your path. Run the following to see usage / help:
 
 ```
 rich --help
 ```
-
-ℹ️ More installation methods coming soon.
 
 ## Syntax highlighting
 
