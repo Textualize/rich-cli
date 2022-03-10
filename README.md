@@ -23,7 +23,6 @@ pipx install rich-cli
 You can install Rich-CLI with [Homebew](https://brew.sh/).
 
 ```
-brew tap textualize/rich
 brew install rich
 ```
 
