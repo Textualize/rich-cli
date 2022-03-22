@@ -717,7 +717,7 @@ def render_csv(
     csv_data, _ = read_resource(resource, "csv")
     sniffer = csv.Sniffer()
     try:
-        dialect = sniffer.sniff(csv_data[:1024])
+        dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
         has_header = sniffer.has_header(csv_data[:1024])
     except Exception as error:
         on_error(str(error))
