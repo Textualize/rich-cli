@@ -725,10 +725,10 @@ def render_csv(
         dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
         has_header = sniffer.has_header(csv_data[:1024])
     except csv.Error as error:
-        if resource.endswith(".csv"):
+        if resource.lower().endswith(".csv"):
             dialect = csv.get_dialect("excel")
             has_header = True
-        elif resource.endswith(".tsv"):
+        elif resource.lower().endswith(".tsv"):
             dialect = csv.get_dialect("excel-tab")
             has_header = True
         else:
