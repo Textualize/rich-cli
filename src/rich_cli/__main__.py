@@ -717,10 +717,17 @@ def render_csv(
     csv_data, _ = read_resource(resource, "csv")
     sniffer = csv.Sniffer()
     try:
-        dialect = sniffer.sniff(csv_data[:1024])
+        dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
         has_header = sniffer.has_header(csv_data[:1024])
-    except Exception as error:
-        on_error(str(error))
+    except csv.Error as error:
+        if resource.endswith(".csv"):
+            dialect = csv.get_dialect("excel")
+            has_header = True
+        elif resource.endswith(".tsv"):
+            dialect = csv.get_dialect("excel-tab")
+            has_header = True
+        else:
+            on_error(str(error))
 
     csv_file = io.StringIO(csv_data)
     reader = csv.reader(csv_file, dialect=dialect)
