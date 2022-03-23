@@ -109,7 +109,7 @@ rich cats.json
 
 ## CSV
 
-Rich can display the contents of a CSV (or TSV) as a table. If the file ends with `.csv` or `.tsv` then JSON will be auto-detected.
+Rich can display the contents of a CSV (or TSV) as a table. If the file ends with `.csv` or `.tsv` then CSV will be auto-detected.
 
 ```
 rich deniro.csv
