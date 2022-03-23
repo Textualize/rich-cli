@@ -58,6 +58,10 @@ class PagerApp(App):
     async def on_load(self, event: events.Load) -> None:
         await self.bind("q", "quit", "Quit")
 
+    async def on_key(self, event: events.Key) -> None:
+        if event.key == " ":
+            self.body.page_down()
+
     async def on_mount(self, event: events.Mount) -> None:
         self.body = body = ScrollView(auto_width=True)
 
