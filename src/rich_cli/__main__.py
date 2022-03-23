@@ -558,7 +558,7 @@ def main(
             on_error("unable to read json", error)
 
     elif resource_format == MARKDOWN:
-        from rich.markdown import Markdown
+        from .markdown import Markdown
 
         markdown_data, lexer = read_resource(resource, lexer)
         renderable = Markdown(markdown_data, hyperlinks=hyperlinks)
