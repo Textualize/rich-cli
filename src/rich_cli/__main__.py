@@ -561,13 +561,18 @@ def main(
         from rich.markdown import Markdown
 
         markdown_data, lexer = read_resource(resource, lexer)
-        renderable = Markdown(markdown_data, hyperlinks=hyperlinks)
+        renderable = Markdown(markdown_data, code_theme=theme, hyperlinks=hyperlinks)
 
     elif resource_format == RST:
         from rich_rst import RestructuredText
 
-        rst_data, lexter = read_resource(resource, lexer)
-        renderable = RestructuredText(rst_data, show_errors=False)
+        rst_data, _ = read_resource(resource, lexer)
+        renderable = RestructuredText(
+            rst_data,
+            code_theme=theme,
+            default_lexer=lexer or "python",
+            show_errors=False,
+        )
 
     elif resource_format == INSPECT:
         try:
