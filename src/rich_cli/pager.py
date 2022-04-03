@@ -59,8 +59,18 @@ class PagerApp(App):
         await self.bind("q", "quit", "Quit")
 
     async def on_key(self, event: events.Key) -> None:
-        if event.key == " ":
+        if event.key == "j":
+            self.body.scroll_up()
+        elif event.key == "k":
+            self.body.scroll_down()
+        elif event.key == " ":
             self.body.page_down()
+        elif event.key == "ctrl+u":
+            self.body.target_y -= self.body.size.height // 2
+            self.body.animate("y", self.body.target_y, easing="out_cubic")
+        elif event.key == "ctrl+d":
+            self.body.target_y += self.body.size.height // 2
+            self.body.animate("y", self.body.target_y, easing="out_cubic")
 
     async def on_mount(self, event: events.Mount) -> None:
         self.body = body = ScrollView(auto_width=True)
