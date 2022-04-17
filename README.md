@@ -20,7 +20,7 @@ pipx install rich-cli
 
 ### MacOS
 
-You can install Rich-CLI with [Homebew](https://brew.sh/).
+You can install Rich-CLI with [Homebrew](https://brew.sh/).
 
 ```
 brew install rich
