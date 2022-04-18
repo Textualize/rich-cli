@@ -94,6 +94,17 @@ If your terminal supports hyperlinks, you can add `--hyperlinks` or `-y` which w
 rich README.md --hyperlinks
 ```
 
+## Jupyter notebook
+
+You can request Jupyter notebook rendering by adding the `--ipynb` switch. If the file ends with `.ipynb` Jupyter notebook will be auto-detected.
+
+```
+rich notebook.ipynb
+```
+
+All options that apply to syntax highlighting can be applied to code cells, and all options that apply to Markdown can be
+applied to Markdown cells.
+
 ## JSON
 
 You can request JSON pretty formatting and highlighting with the `--json` or `-j` switches. If the file ends with `.json` then JSON will be auto-detected.

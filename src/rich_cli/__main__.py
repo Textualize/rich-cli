@@ -49,6 +49,7 @@ JSON = 5
 RULE = 6
 INSPECT = 7
 CSV = 8
+IPYNB = 9
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
@@ -250,6 +251,7 @@ class RichCommand(click.Command):
 @click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
 @click.option("--rst", is_flag=True, help="Display [u]restructured text[/u].")
 @click.option("--csv", is_flag=True, help="Display [u]CSV[/u] as a table.")
+@click.option("--ipynb", is_flag=True, help="Display [u]Jupyter notebook[/u].")
 @click.option("--syntax", is_flag=True, help="[u]Syntax[/u] highlighting.")
 @click.option("--inspect", is_flag=True, help="[u]Inspect[/u] a python object.")
 @click.option(
@@ -396,6 +398,7 @@ def main(
     markdown: bool = False,
     rst: bool = False,
     csv: bool = False,
+    ipynb: bool = False,
     inspect: bool = True,
     emoji: bool = False,
     left: bool = False,
@@ -478,6 +481,8 @@ def main(
         resource_format = CSV
     elif rst:
         resource_format = RST
+    elif ipynb:
+        resource_format = IPYNB
 
     if resource_format == AUTO and "." in resource:
         import os.path
@@ -503,6 +508,8 @@ def main(
             resource_format = CSV
         elif ext == ".rst":
             resource_format = RST
+        elif ext == ".ipynb":
+            resource_format = IPYNB
 
     if resource_format == AUTO:
         resource_format = SYNTAX
@@ -590,6 +597,20 @@ def main(
     elif resource_format == CSV:
 
         renderable = render_csv(resource, head, tail, title, caption)
+
+    elif resource_format == IPYNB:
+
+        renderable = render_ipynb(
+            resource,
+            theme,
+            hyperlinks,
+            lexer,
+            head,
+            tail,
+            line_numbers,
+            guides,
+            no_wrap,
+        )
 
     else:
         if not resource:
@@ -776,6 +797,99 @@ def render_csv(
             table_column.header_style = "bold green"
 
     return table
+
+
+def render_ipynb(
+    resource: str,
+    theme: str,
+    hyperlinks: bool,
+    lexer: str,
+    head: Optional[int],
+    tail: Optional[int],
+    line_numbers: bool,
+    guides: bool,
+    no_wrap: bool,
+) -> RenderableType:
+    """Render resource as Jupyter notebook.
+
+    Args:
+        resource (str): Resource string.
+        theme (str): Syntax theme for code cells.
+        hyperlinks (bool): Whether to render hyperlinks in Markdown cells.
+        lexer (str): Lexer for code cell syntax highlighting (if no language set in notebook).
+        head (int): Display first `head` lines of each cell.
+        tail (int): Display last `tail` lines of each cell.
+        line_numbers (bool): Enable line number in code cells.
+        guides (bool): Enable indentation guides in code cell syntax highlighting.
+        no_wrap (bool): Don't word wrap syntax highlighted cells.
+
+    Returns:
+        RenderableType: Notebook as Markdown renderable.
+    """
+    import json
+    from rich.syntax import Syntax
+    from rich.console import Group
+    from rich.panel import Panel
+    from .markdown import Markdown
+
+    notebook_str, _ = read_resource(resource, None)
+    notebook_dict = json.loads(notebook_str)
+    lexer = lexer or notebook_dict.get("metadata", {}).get("kernelspec", {}).get(
+        "language", ""
+    )
+
+    renderable: RenderableType
+    new_line = True
+    cells: List[RenderableType] = []
+    for cell in notebook_dict["cells"]:
+        if new_line:
+            cells.append("")
+        if "execution_count" in cell:
+            execution_count = cell["execution_count"] or " "
+            cells.append(f"[green]In [[#66ff00]{execution_count}[/#66ff00]]:[/green]")
+        source = "".join(cell["source"])
+        if cell["cell_type"] == "code":
+            num_lines = len(source.splitlines())
+            line_range = _line_range(head, tail, num_lines)
+            renderable = Panel(
+                Syntax(
+                    source,
+                    lexer,
+                    theme=theme,
+                    line_numbers=line_numbers,
+                    indent_guides=guides,
+                    word_wrap=not no_wrap,
+                    line_range=line_range,
+                )
+            )
+        elif cell["cell_type"] == "markdown":
+            renderable = Markdown(source, code_theme=theme, hyperlinks=hyperlinks)
+        else:
+            renderable = Text(source)
+        new_line = True
+        cells.append(renderable)
+        for output in cell.get("outputs", []):
+            output_type = output["output_type"]
+            if output_type == "stream":
+                renderable = "".join(output["text"])
+                new_line = False
+            elif output_type == "error":
+                renderable = Text("\n".join(output["traceback"]).rstrip())
+                new_line = True
+            elif output_type == "execute_result":
+                execution_count = output.get("execution_count", " ") or " "
+                renderable = (
+                    f"[red]Out[[#ee4b2b]{execution_count}[/#ee4b2b]]:[/red]\n"
+                    + "\n".join(output["data"].get("text/plain", ""))
+                )
+                new_line = True
+            else:
+                continue
+            cells.append(renderable)
+
+    renderable = Group(*cells)
+
+    return renderable
 
 
 def _line_range(
