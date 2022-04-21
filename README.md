@@ -28,10 +28,16 @@ brew install rich
 
 ### Universal
 
-Rich-CLI may be installed as a Python package.
+Rich-CLI may be installed as a Python package, either using `pip`:
 
 ```
 python -m pip install rich-cli
+```
+
+Or using `conda` or `mamba`:
+
+```
+mamba install -c conda-forge rich-cli
 ```
 
 ## Rich command
