@@ -231,9 +231,16 @@ class RichCommand(click.Command):
             )
         )
 
+        from rich.color import Color
+
         console.print(
-            blend_text("♥ https://www.textualize.io", (32, 32, 255), (255, 32, 255)),
-            justify="right",
+            blend_text(
+                "♥ https://www.textualize.io",
+                Color.parse("#b169dd").triplet,
+                Color.parse("#542c91").triplet,
+            ),
+            justify="left",
+            style="bold",
         )
 
 
@@ -385,6 +392,9 @@ class RichCommand(click.Command):
     default="",
     help="Write HTML to [b]PATH[/b].",
 )
+@click.option(
+    "--export-svg", metavar="PATH", default="", help="Write SVG to [b]PATH[/b]."
+)
 @click.option("--pager", is_flag=True, help="Display in an interactive pager.")
 @click.option("--version", "-v", is_flag=True, help="Print version and exit.")
 def main(
@@ -428,7 +438,8 @@ def main(
     lexer: str = "",
     hyperlinks: bool = False,
     force_terminal: bool = False,
-    export_html: Optional[str] = None,
+    export_html: str = "",
+    export_svg: str = "",
     pager: bool = False,
 ):
     """Rich toolbox for console output."""
@@ -437,7 +448,7 @@ def main(
         return
     console = Console(
         emoji=emoji,
-        record=bool(export_html),
+        record=bool(export_html or export_svg),
         force_terminal=force_terminal if force_terminal else None,
     )
 
@@ -711,9 +722,15 @@ def main(
 
     if export_html:
         try:
-            console.save_html(export_html)
+            console.save_html(export_html, clear=False)
         except Exception as error:
             on_error("failed to save HTML", error)
+
+    if export_svg:
+        try:
+            console.save_svg(export_svg, clear=False)
+        except Exception as error:
+            on_error("failed to save SVG", error)
 
 
 def render_csv(
