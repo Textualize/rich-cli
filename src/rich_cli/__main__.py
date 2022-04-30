@@ -901,7 +901,7 @@ def render_ipynb(
                 )
                 data = output["data"].get("text/plain", "")
                 if isinstance(data, list):
-                    renderable += Text.from_ansi("\n".join(data))
+                    renderable += Text.from_ansi("".join(data))
                 else:
                     renderable += Text.from_ansi(data)
                 new_line = True
