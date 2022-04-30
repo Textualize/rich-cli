@@ -37,7 +37,7 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.6.1"
+VERSION = "1.7.0"
 
 
 AUTO = 0
@@ -860,7 +860,8 @@ def render_ipynb(
                     indent_guides=guides,
                     word_wrap=not no_wrap,
                     line_range=line_range,
-                )
+                ),
+                border_style="dim",
             )
         elif cell["cell_type"] == "markdown":
             renderable = Markdown(source, code_theme=theme, hyperlinks=hyperlinks)
@@ -871,20 +872,23 @@ def render_ipynb(
         for output in cell.get("outputs", []):
             output_type = output["output_type"]
             if output_type == "stream":
-                renderable = "".join(output["text"])
+                renderable = Text.from_ansi("".join(output["text"]))
                 new_line = False
             elif output_type == "error":
-                renderable = Text("\n".join(output["traceback"]).rstrip())
+                renderable = Text.from_ansi("\n".join(output["traceback"]).rstrip())
                 new_line = True
             elif output_type == "execute_result":
                 execution_count = output.get("execution_count", " ") or " "
-                renderable = (
+                renderable = Text.from_markup(
                     f"[red]Out[[#ee4b2b]{execution_count}[/#ee4b2b]]:[/red]\n"
-                    + "\n".join(output["data"].get("text/plain", ""))
+                )
+                renderable += Text.from_ansi(
+                    "\n".join(output["data"].get("text/plain", ""))
                 )
                 new_line = True
             else:
                 continue
+
             cells.append(renderable)
 
     renderable = Group(*cells)
