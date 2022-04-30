@@ -20,7 +20,7 @@ pipx install rich-cli
 
 ### MacOS
 
-You can install Rich-CLI with [Homebew](https://brew.sh/).
+You can install Rich-CLI with [Homebrew](https://brew.sh/).
 
 ```
 brew install rich
@@ -28,12 +28,16 @@ brew install rich
 
 ### Universal
 
-Rich-CLI may be installed as a Python package.
-
-ℹ️ It is reccomended to create a _virtual environment_ first, to avoid any dependency conflicts.
+Rich-CLI may be installed as a Python package, either using `pip`:
 
 ```
 python -m pip install rich-cli
+```
+
+Or using `conda` or `mamba`:
+
+```
+mamba install -c conda-forge rich-cli
 ```
 
 ## Rich command
@@ -95,6 +99,17 @@ If your terminal supports hyperlinks, you can add `--hyperlinks` or `-y` which w
 ```
 rich README.md --hyperlinks
 ```
+
+## Jupyter notebook
+
+You can request Jupyter notebook rendering by adding the `--ipynb` switch. If the file ends with `.ipynb` Jupyter notebook will be auto-detected.
+
+```
+rich notebook.ipynb
+```
+
+All options that apply to syntax highlighting can be applied to code cells, and all options that apply to Markdown can be
+applied to Markdown cells.
 
 ## JSON
 
