@@ -882,9 +882,11 @@ def render_ipynb(
                 renderable = Text.from_markup(
                     f"[red]Out[[#ee4b2b]{execution_count}[/#ee4b2b]]:[/red]\n"
                 )
-                renderable += Text.from_ansi(
-                    "\n".join(output["data"].get("text/plain", ""))
-                )
+                data = output["data"].get("text/plain", "")
+                if isinstance(data, list):
+                    renderable += Text.from_ansi("\n".join(data))
+                else:
+                    renderable += Text.from_ansi(data)
                 new_line = True
             else:
                 continue
