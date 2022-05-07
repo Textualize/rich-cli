@@ -179,7 +179,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
 name = "rich"
-version = "12.3.0"
+version = "12.4.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "main"
 optional = false
@@ -268,7 +268,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "898ef05d770288bf54cfe3c14788071dc4dfcd6f4b28deefbcdd7611f4f562f8"
+content-hash = "78e06c2473bf38887e7fe55c9a38b77ba99bcda202252ca1136fae511ae81cd6"
 
 [metadata.files]
 black = [
@@ -374,8 +374,8 @@ requests = [
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
 ]
 rich = [
-    {file = "rich-12.3.0-py3-none-any.whl", hash = "sha256:0eb63013630c6ee1237e0e395d51cb23513de6b5531235e33889e8842bdf3a6f"},
-    {file = "rich-12.3.0.tar.gz", hash = "sha256:7e8700cda776337036a712ff0495b04052fb5f957c7dfb8df997f88350044b64"},
+    {file = "rich-12.4.0-py3-none-any.whl", hash = "sha256:fdf6f447f231289dd446d31e5ee856fb0cc7dccd852a80f3e9d5aeecccabaedc"},
+    {file = "rich-12.4.0.tar.gz", hash = "sha256:7aebf67874dc5cc2c89e2cb6ac322c95bd92510df2af0296c8bf494335ef704f"},
 ]
 rich-rst = [
     {file = "rich-rst-1.1.7.tar.gz", hash = "sha256:898bd5defd6bde9fba819614575dc5bff18047af38ae1981de0c1e78f17bbfd5"},

@@ -37,7 +37,7 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.7.0"
+VERSION = "1.8.0"
 
 
 AUTO = 0
