@@ -155,7 +155,7 @@ def blend_text(
     size = len(text)
     for index in range(size):
         blend = index / size
-        color = f"#{int(r1 + dr * blend):2X}{int(g1 + dg * blend):2X}{int(b1 + db * blend):2X}"
+        color = f"#{int(r1 + dr * blend):02X}{int(g1 + dg * blend):02X}{int(b1 + db * blend):02X}"
         text.stylize(color, index, index + 1)
     return text
 
