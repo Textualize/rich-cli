@@ -102,7 +102,7 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
         if path == "-":
             return (sys.stdin.read(), None)
 
-        with open(path, "rt") as resource_file:
+        with open(path, "rt", encoding="utf8", errors="replace") as resource_file:
             text = resource_file.read()
         if not lexer:
             _, dot, ext = path.rpartition(".")
