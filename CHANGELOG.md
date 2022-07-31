@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Rich-CLI now assumes that the input file is encoded in UTF-8 https://github.com/Textualize/rich-cli/pull/56
-- Add support for setting `--hyperlinks` via the `RICH_HYPERLINKS` environment variable https://github.com/Textualize/rich-cli/pull/58
+- Add support for setting `--hyperlinks` via the `RICH_HYPERLINKS` environment variable https://github.com/Textualize/rich-cli/pull/61
 
 ## [1.8.0] - 2022-05-07
 
