@@ -100,6 +100,12 @@ If your terminal supports hyperlinks, you can add `--hyperlinks` or `-y` which w
 rich README.md --hyperlinks
 ```
 
+This can also be set via the `RICH_HYPERLINKS` environment variable. So the following is equivalent to the above command:
+
+```
+RICH_HYPERLINKS=true rich README.md
+```
+
 ## Jupyter notebook
 
 You can request Jupyter notebook rendering by adding the `--ipynb` switch. If the file ends with `.ipynb` Jupyter notebook will be auto-detected.

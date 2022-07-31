@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.9.0] - 2022-07-31
 
 ### Changed
 
 - Rich-CLI now assumes that the input file is encoded in UTF-8 https://github.com/Textualize/rich-cli/pull/56
+- Add support for setting `--hyperlinks` via the `RICH_HYPERLINKS` environment variable https://github.com/Textualize/rich-cli/pull/58
 
 ## [1.8.0] - 2022-05-07
 
