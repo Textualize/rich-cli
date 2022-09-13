@@ -147,7 +147,7 @@ rich "Hello [b]World[/b]!" --rule --rule-style "red" --rule-char "="
 
 Add `--pager` to display the content with a built in pager application.
 
-Scroll the pager with cursor keys, page up/down, home, end. Alternatively use the scrollbar which will be visible to the right of the terminal. Or use the vi navigation (j, k, ctrl_d, ctrl-u).
+Scroll the pager with cursor keys, page up/down, home, end. Alternatively use the scrollbar which will be visible to the right of the terminal. Or use the vi navigation (j, k, ctrl-d, ctrl-u).
 
 ```
 rich __main__.py -n -g --theme monokai --pager
