@@ -278,7 +278,7 @@ class RichCommand(click.Command):
     help="Display last [b]LINES[/] of the file (requires --syntax or --csv).",
 )
 @click.option(
-    "--emoji", "-j", is_flag=True, help="Enable emoji code. [dim]e.g. :sparkle:"
+    "--emoji", "-J", is_flag=True, help="Enable emoji code. [dim]e.g. :sparkle:"
 )
 @click.option("--left", "-l", is_flag=True, help="Align to left.")
 @click.option("--right", "-r", is_flag=True, help="Align to right.")
