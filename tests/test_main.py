@@ -35,7 +35,7 @@ def test_duplicate_option_flags_raises_exception(monkeypatch):
     monkeypatch.setattr(click.decorators, "_param_memo", _param_memo_safe)
 
     # import here (after monkeypatch) because decorators are run on import
-    from src.rich_cli.__main__ import main
+    from rich_cli.__main__ import main
 
     runner = CliRunner()
     runner.invoke(main)
