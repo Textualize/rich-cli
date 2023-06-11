@@ -1,6 +1,7 @@
 from operator import itemgetter
 import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
+import csv
 
 import click
 from pygments.util import ClassNotFound
@@ -258,6 +259,12 @@ class RichCommand(click.Command):
 @click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
 @click.option("--rst", is_flag=True, help="Display [u]restructured text[/u].")
 @click.option("--csv", is_flag=True, help="Display [u]CSV[/u] as a table.")
+@click.option(
+    "--csv-format",
+    type=click.Choice(csv.list_dialects()),
+    default=None,
+    help=f"Select [u]CSV Format[/u] from {str(csv.list_dialects()).replace('-','−')}.",
+)
 @click.option("--ipynb", is_flag=True, help="Display [u]Jupyter notebook[/u].")
 @click.option("--syntax", is_flag=True, help="[u]Syntax[/u] highlighting.")
 @click.option("--inspect", is_flag=True, help="[u]Inspect[/u] a python object.")
@@ -408,6 +415,7 @@ def main(
     markdown: bool = False,
     rst: bool = False,
     csv: bool = False,
+    csv_format: Optional[str] = None,
     ipynb: bool = False,
     inspect: bool = True,
     emoji: bool = False,
@@ -607,7 +615,7 @@ def main(
 
     elif resource_format == CSV:
 
-        renderable = render_csv(resource, head, tail, title, caption)
+        renderable = render_csv(resource, head, tail, title, caption, csv_format)
 
     elif resource_format == IPYNB:
 
@@ -739,6 +747,7 @@ def render_csv(
     tail: Optional[int] = None,
     title: Optional[str] = None,
     caption: Optional[str] = None,
+    csv_format: Optional[str] = None,
 ) -> RenderableType:
     """Render resource as CSV.
 
@@ -749,7 +758,6 @@ def render_csv(
         RenderableType: Table renderable.
     """
     import io
-    import csv
     import re
     from rich import box
     from rich.table import Table
@@ -759,18 +767,25 @@ def render_csv(
 
     csv_data, _ = read_resource(resource, "csv")
     sniffer = csv.Sniffer()
+    if csv_format is not None:
+        dialect = csv.get_dialect(csv_format)
+    else:
+        try:
+            dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
+
+        except csv.Error as error:
+            if resource.lower().endswith(".csv"):
+                dialect = csv.get_dialect("excel")
+                has_header = True
+            elif resource.lower().endswith(".tsv"):
+                dialect = csv.get_dialect("excel-tab")
+                has_header = True
+            else:
+                on_error(str(error))
     try:
-        dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
         has_header = sniffer.has_header(csv_data[:1024])
     except csv.Error as error:
-        if resource.lower().endswith(".csv"):
-            dialect = csv.get_dialect("excel")
-            has_header = True
-        elif resource.lower().endswith(".tsv"):
-            dialect = csv.get_dialect("excel-tab")
-            has_header = True
-        else:
-            on_error(str(error))
+        has_header = True
 
     csv_file = io.StringIO(csv_data)
     reader = csv.reader(csv_file, dialect=dialect)
