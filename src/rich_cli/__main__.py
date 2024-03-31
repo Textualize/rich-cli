@@ -577,8 +577,11 @@ def main(
 
     elif resource_format == MARKDOWN:
         from .markdown import Markdown
+        from rich.emoji import Emoji
 
         markdown_data, lexer = read_resource(resource, lexer)
+        if emoji:
+            markdown_data = Emoji.replace(markdown_data)
         renderable = Markdown(markdown_data, code_theme=theme, hyperlinks=hyperlinks)
 
     elif resource_format == RST:
