@@ -177,7 +177,7 @@ After running this command you should find a "readme.html" in your current worki
 
 ## Rich Printing
 
-If you add the `--print` or `--p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
+If you add the `--print` or `-p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
 
 ```
 rich "Hello, [bold magenta]World[/]!" --print
