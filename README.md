@@ -113,7 +113,7 @@ applied to Markdown cells.
 
 ## JSON
 
-You can request JSON pretty formatting and highlighting with the `--json` or `-j` switches. If the file ends with `.json` then JSON will be auto-detected.
+You can request JSON pretty formatting and highlighting with the `--json` or `-J` switches. If the file ends with `.json` then JSON will be auto-detected.
 
 ```
 rich cats.json

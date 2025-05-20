@@ -254,7 +254,7 @@ class RichCommand(click.Command):
     help="Print [u]console markup[/u]. [dim]See https://rich.readthedocs.io/en/latest/markup.html",
 )
 @click.option("--rule", "-u", is_flag=True, help="Display a horizontal [u]rule[/u].")
-@click.option("--json", "-j", is_flag=True, help="Display as [u]JSON[/u].")
+@click.option("--json", "-J", is_flag=True, help="Display as [u]JSON[/u].")
 @click.option("--markdown", "-m", is_flag=True, help="Display as [u]markdown[/u].")
 @click.option("--rst", is_flag=True, help="Display [u]restructured text[/u].")
 @click.option("--csv", is_flag=True, help="Display [u]CSV[/u] as a table.")
