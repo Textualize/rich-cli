@@ -87,12 +87,14 @@ class PagerApp(App):
             # half page-up
             self.body.target_y -= self.body.size.height // 2
             self.body.y = self.body.target_y
-        elif event.key == "1":
-            # jump to home ; shorthand for the "less" command "1 -> Shift+G"
+        elif event.key == "g" or event.key == "1" :
+            # jump to first line 
+            # "g" is the "less" version; "1" is a shorthand for the "vi" command "1 -> Shift+G"
             self.body.target_x = self.body.target_y = 0
             self.body.x = self.body.y = 0
         elif event.key == "G":
-            # jump to end 
+            # jump to last line
+            # Same shortcut in both "less" and "vi"
             self.body.target_x = 0
             self.body.target_y = self.body.window.virtual_size.height - self.body.size.height
             self.body.x, self.body.y = self.body.target_x, self.body.target_y
