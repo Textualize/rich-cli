@@ -71,6 +71,31 @@ class PagerApp(App):
         elif event.key == "ctrl+d":
             self.body.target_y += self.body.size.height // 2
             self.body.animate("y", self.body.target_y, easing="out_cubic")
+        elif event.key == "f":
+            # page down
+            self.body.target_y += self.body.size.height
+            self.body.y = self.body.target_y
+        elif event.key == "b":
+            # page up
+            self.body.target_y -= self.body.size.height
+            self.body.y = self.body.target_y
+        elif event.key == "d":
+            # half page-down
+            self.body.target_y += self.body.size.height // 2
+            self.body.y = self.body.target_y
+        elif event.key == "u":
+            # half page-up
+            self.body.target_y -= self.body.size.height // 2
+            self.body.y = self.body.target_y
+        elif event.key == "1":
+            # jump to home ; shorthand for the "less" command "1 -> Shift+G"
+            self.body.target_x = self.body.target_y = 0
+            self.body.x = self.body.y = 0
+        elif event.key == "G":
+            # jump to end 
+            self.body.target_x = 0
+            self.body.target_y = self.body.window.virtual_size.height - self.body.size.height
+            self.body.x, self.body.y = self.body.target_x, self.body.target_y
 
     async def on_mount(self, event: events.Mount) -> None:
         self.body = body = ScrollView(auto_width=True)
