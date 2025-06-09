@@ -261,6 +261,7 @@ class RichCommand(click.Command):
 @click.option("--ipynb", is_flag=True, help="Display [u]Jupyter notebook[/u].")
 @click.option("--syntax", is_flag=True, help="[u]Syntax[/u] highlighting.")
 @click.option("--inspect", is_flag=True, help="[u]Inspect[/u] a python object.")
+@click.option("--header", type=bool, metavar="BOOL", default=None, help="Overrides the CSV [u]header[/u] detection (requires --csv).")
 @click.option(
     "--head",
     "-h",
@@ -410,6 +411,7 @@ def main(
     csv: bool = False,
     ipynb: bool = False,
     inspect: bool = True,
+    header: Optional[bool] = None,
     emoji: bool = False,
     left: bool = False,
     right: bool = False,
@@ -607,7 +609,7 @@ def main(
 
     elif resource_format == CSV:
 
-        renderable = render_csv(resource, head, tail, title, caption)
+        renderable = render_csv(resource, head, tail, title, caption, header)
 
     elif resource_format == IPYNB:
 
@@ -739,6 +741,7 @@ def render_csv(
     tail: Optional[int] = None,
     title: Optional[str] = None,
     caption: Optional[str] = None,
+    header: Optional[bool] = None,
 ) -> RenderableType:
     """Render resource as CSV.
 
@@ -771,6 +774,9 @@ def render_csv(
             has_header = True
         else:
             on_error(str(error))
+    finally:
+        if header is not None:
+            has_header = header
 
     csv_file = io.StringIO(csv_data)
     reader = csv.reader(csv_file, dialect=dialect)
