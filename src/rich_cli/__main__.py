@@ -37,7 +37,7 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.8.0"
+VERSION = "1.9.0"
 
 
 AUTO = 0
@@ -370,7 +370,13 @@ class RichCommand(click.Command):
     default=None,
     help="Use [b]LEXER[/b] for syntax highlighting. [dim]See https://pygments.org/docs/lexers/",
 )
-@click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
+@click.option(
+    "--hyperlinks",
+    "-y",
+    is_flag=True,
+    help="Render hyperlinks in markdown.",
+    envvar="RICH_HYPERLINKS",
+)
 @click.option(
     "--no-wrap", is_flag=True, help="Don't word wrap syntax highlighted files."
 )
