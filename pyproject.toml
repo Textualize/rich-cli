@@ -35,13 +35,14 @@ homepage = "https://github.com/Textualize/rich-cli"
 [project.scripts]
 rich = "rich_cli.__main__:run"
 
+[project.entry-points."pipx.run"]
+rich-cli = 'rich_cli.__main__:run'
+
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 black = "22.3.0"
 mypy = "0.942"
 
-[tool.poetry.plugins."pipx.run"]
-rich-cli = 'rich_cli.__main__:run'
