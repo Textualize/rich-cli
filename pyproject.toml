@@ -1,11 +1,12 @@
-[tool.poetry]
+[project]
 name = "rich-cli"
-homepage = "https://github.com/Textualize/rich-cli"
+urls.homepage = "https://github.com/Textualize/rich-cli"
 version = "1.8.0"
 description = "Command Line Interface to Rich"
-authors = ["Will McGugan <willmcgugan@gmail.com>"]
-license = "MIT"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Will McGugan", email = "willmcgugan@gmail.com" }]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -13,31 +14,37 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",    
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "rich (>=12.4.0,<13.0.0)",
+    "click (>=8.0.0,<9.0.0)",
+    "requests (>=2.0.0,<3.0.0)",
+    "textual (>=0.1.18,<0.2.0)",
+    "rich-rst (>=1.1.7,<2.0.0)",
 ]
 
-
 [tool.poetry.dependencies]
-python = "^3.7"
-rich = "^12.4.0"
-click = "^8.0.0"
-requests = "^2.0.0"
-textual = "^0.1.18"
-rich-rst = "^1.1.7"
+python = ">=3.9,<4.0" # required for locking in Poetry 2+
 
-[tool.poetry.dev-dependencies]
+[project.scripts]
+rich = "rich_cli.__main__:run"
+
+[project.entry-points."pipx.run"]
+rich-cli = "rich_cli.__main__:run"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
 black = "22.3.0"
 mypy = "0.942"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-rich = 'rich_cli.__main__:run'
-
-[tool.poetry.plugins."pipx.run"]
-rich-cli = 'rich_cli.__main__:run'
+[dependency-groups]
+dev = ["black==22.3.0", "mypy==0.942"]
