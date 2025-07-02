@@ -1,42 +1,42 @@
 [project]
 name = "rich-cli"
+urls.homepage = "https://github.com/Textualize/rich-cli"
 version = "1.8.0"
 description = "Command Line Interface to Rich"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Will McGugan", email = "willmcgugan@gmail.com" }]
 classifiers = [
-  "Development Status :: 5 - Production/Stable",
-  "Environment :: Console",
-  "Intended Audience :: Developers",
-  "Operating System :: Microsoft :: Windows",
-  "Operating System :: MacOS",
-  "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.7,<4.0"
+requires-python = ">=3.9"
 dependencies = [
-  "rich~=12.4",
-  "click~=8.0",
-  "requests~=2.0",
-  "textual~=0.1",
-  "rich-rst~=1.1",
-  "docutils~=0.18.1"
+    "rich (>=12.4.0,<13.0.0)",
+    "click (>=8.0.0,<9.0.0)",
+    "requests (>=2.0.0,<3.0.0)",
+    "textual (>=0.1.18,<0.2.0)",
+    "rich-rst (>=1.1.7,<2.0.0)",
 ]
 
-[project.urls]
-homepage = "https://github.com/Textualize/rich-cli"
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0" # required for locking in Poetry 2+
 
 [project.scripts]
 rich = "rich_cli.__main__:run"
 
 [project.entry-points."pipx.run"]
-rich-cli = 'rich_cli.__main__:run'
+rich-cli = "rich_cli.__main__:run"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -46,3 +46,5 @@ build-backend = "poetry.core.masonry.api"
 black = "22.3.0"
 mypy = "0.942"
 
+[dependency-groups]
+dev = ["black==22.3.0", "mypy==0.942"]
