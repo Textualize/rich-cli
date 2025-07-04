@@ -26,6 +26,12 @@ You can install Rich-CLI with [Homebrew](https://brew.sh/).
 brew install rich
 ```
 
+Or with [MacPorts](https://macports.org/).
+
+```
+sudo port install rich-cli
+```
+
 ### Universal
 
 Rich-CLI may be installed as a Python package, either using `pip`:
