@@ -43,8 +43,8 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-black = "22.3.0"
-mypy = "0.942"
+black = "^25.1.0"
+mypy = "^1.16.1"
 
 [dependency-groups]
-dev = ["black==22.3.0", "mypy==0.942"]
+dev = ["black>=25.1,<26", "mypy>=1.16.1,<2"]
