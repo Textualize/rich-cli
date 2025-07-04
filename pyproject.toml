@@ -1,7 +1,7 @@
 [project]
 name = "rich-cli"
 urls.homepage = "https://github.com/Textualize/rich-cli"
-version = "1.8.0"
+version = "1.8.1"
 description = "Command Line Interface to Rich"
 readme = "README.md"
 license = "MIT"

@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Nothing yet
+
+## [1.8.1] - 2025-07-04
+
+### Fixed
+
+- "UserWarning: The parameter -j is used more than once" in https://github.com/Textualize/rich-cli/pull/74
+- Fixed generic blend text in https://github.com/Textualize/rich-cli/pull/51
+
 ### Changed
 
 - Rich-CLI now assumes that the input file is encoded in UTF-8 https://github.com/Textualize/rich-cli/pull/56
+- The JSON display mode is now `-J/--json`
+- _Python >= 3.9_ is now required, so no more support for 3.7 and 3.8
+- Hard-code UTF-8 encoding for the input file in https://github.com/Textualize/rich-cli/pull/56
+- Updated pyproject.toml to PEP621 and Poetry 2.* in https://github.com/Textualize/rich-cli/pull/103
 
 ## [1.8.0] - 2022-05-07
 
