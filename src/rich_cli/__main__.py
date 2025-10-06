@@ -364,6 +364,11 @@ class RichCommand(click.Command):
     help="Enable indentation guides in syntax highlighting",
 )
 @click.option(
+    "--show-lines",
+    is_flag=True,
+    help="Show lines between rows in CSV tables.",
+)
+@click.option(
     "--lexer",
     "-x",
     metavar="LEXER",
@@ -435,6 +440,7 @@ def main(
     theme: str = "",
     line_numbers: bool = False,
     guides: bool = False,
+    show_lines: bool = False,
     lexer: str = "",
     hyperlinks: bool = False,
     force_terminal: bool = False,
@@ -607,7 +613,7 @@ def main(
 
     elif resource_format == CSV:
 
-        renderable = render_csv(resource, head, tail, title, caption)
+        renderable = render_csv(resource, head, tail, title, caption, show_lines)
 
     elif resource_format == IPYNB:
 
@@ -739,11 +745,17 @@ def render_csv(
     tail: Optional[int] = None,
     title: Optional[str] = None,
     caption: Optional[str] = None,
+    show_lines: bool = False,
 ) -> RenderableType:
     """Render resource as CSV.
 
     Args:
         resource (str): Resource string.
+        head (Optional[int]): Display first LINES of the file.
+        tail (Optional[int]): Display last LINES of the file.
+        title (Optional[str]): Title for the table.
+        caption (Optional[str]): Caption for the table.
+        show_lines (bool): Show lines between rows.
 
     Returns:
         RenderableType: Table renderable.
@@ -782,6 +794,7 @@ def render_csv(
         title=title,
         caption=caption,
         caption_justify="right",
+        show_lines=show_lines,
     )
     rows = iter(reader)
     if has_header:
