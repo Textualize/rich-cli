@@ -14,16 +14,3 @@ else
     echo "  new  - Run ANSI preprocessing tests"
     exit 1
 fi
-
-
-
-
-			
-		
-
-
-
-
-
-
-
