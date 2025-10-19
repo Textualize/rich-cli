@@ -732,8 +732,6 @@ def main(
 
     def preprocess_ansi_text(text: str) -> "RenderableType":
         """Convert ANSI escape sequences into Rich renderables."""
-        from rich.ansi import AnsiDecoder
-        from rich.console import Group
         from rich.text import Text
 
         try:
