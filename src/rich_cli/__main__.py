@@ -290,7 +290,10 @@ class RichCommand(click.Command):
     "--text-full", "-F", is_flag=True, help="Justify text to both left and right edges."
 )
 @click.option(
-    "--soft", is_flag=True, help="Enable soft wrapping of text (requires --print)."
+    "--soft",
+    is_flag=True,
+    envvar="RICH_SOFT_WRAP",
+    help="Enable soft wrapping of text. Can also be set via RICH_SOFT_WRAP env var.",
 )
 @click.option(
     "--expand", "-e", is_flag=True, help="Expand to full width (requires --panel)."
@@ -300,7 +303,8 @@ class RichCommand(click.Command):
     "-w",
     metavar="SIZE",
     type=int,
-    help="Fit output to [b]SIZE[/] characters.",
+    envvar="RICH_WIDTH",
+    help="Fit output to [b]SIZE[/] characters. Can also be set via RICH_WIDTH env var.",
     default=-1,
 )
 @click.option(
@@ -355,13 +359,18 @@ class RichCommand(click.Command):
     envvar="RICH_THEME",
 )
 @click.option(
-    "--line-numbers", "-n", is_flag=True, help="Enable line number in syntax."
+    "--line-numbers",
+    "-n",
+    is_flag=True,
+    envvar="RICH_LINE_NUMBERS",
+    help="Enable line number in syntax. Can also be set via RICH_LINE_NUMBERS env var.",
 )
 @click.option(
     "--guides",
     "-g",
     is_flag=True,
-    help="Enable indentation guides in syntax highlighting",
+    envvar="RICH_GUIDES",
+    help="Enable indentation guides in syntax highlighting. Can also be set via RICH_GUIDES env var.",
 )
 @click.option(
     "--lexer",
@@ -370,7 +379,13 @@ class RichCommand(click.Command):
     default=None,
     help="Use [b]LEXER[/b] for syntax highlighting. [dim]See https://pygments.org/docs/lexers/",
 )
-@click.option("--hyperlinks", "-y", is_flag=True, help="Render hyperlinks in markdown.")
+@click.option(
+    "--hyperlinks",
+    "-y",
+    is_flag=True,
+    envvar="RICH_HYPERLINKS",
+    help="Render hyperlinks in markdown. Can also be set via RICH_HYPERLINKS env var.",
+)
 @click.option(
     "--no-wrap", is_flag=True, help="Don't word wrap syntax highlighted files."
 )
@@ -383,7 +398,8 @@ class RichCommand(click.Command):
 @click.option(
     "--force-terminal",
     is_flag=True,
-    help="Force terminal output when not writing to a terminal.",
+    envvar="RICH_FORCE_TERMINAL",
+    help="Force terminal output when not writing to a terminal. Can also be set via RICH_FORCE_TERMINAL env var.",
 )
 @click.option(
     "--export-html",
@@ -395,7 +411,12 @@ class RichCommand(click.Command):
 @click.option(
     "--export-svg", metavar="PATH", default="", help="Write SVG to [b]PATH[/b]."
 )
-@click.option("--pager", is_flag=True, help="Display in an interactive pager.")
+@click.option(
+    "--pager",
+    is_flag=True,
+    envvar="RICH_PAGER",
+    help="Display in an interactive pager. Can also be set via RICH_PAGER env var.",
+)
 @click.option("--version", "-v", is_flag=True, help="Print version and exit.")
 def main(
     resource: str,
