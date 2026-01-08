@@ -50,6 +50,7 @@ RULE = 6
 INSPECT = 7
 CSV = 8
 IPYNB = 9
+ANSI = 10
 
 
 def on_error(message: str, error: Optional[Exception] = None, code=-1) -> NoReturn:
@@ -259,6 +260,7 @@ class RichCommand(click.Command):
 @click.option("--rst", is_flag=True, help="Display [u]restructured text[/u].")
 @click.option("--csv", is_flag=True, help="Display [u]CSV[/u] as a table.")
 @click.option("--ipynb", is_flag=True, help="Display [u]Jupyter notebook[/u].")
+@click.option("--ansi", is_flag=True, help="Display [u]ANSI colored/styled text[/u].")
 @click.option("--syntax", is_flag=True, help="[u]Syntax[/u] highlighting.")
 @click.option("--inspect", is_flag=True, help="[u]Inspect[/u] a python object.")
 @click.option(
@@ -409,6 +411,7 @@ def main(
     rst: bool = False,
     csv: bool = False,
     ipynb: bool = False,
+    ansi: bool = False,
     inspect: bool = True,
     emoji: bool = False,
     left: bool = False,
@@ -494,6 +497,8 @@ def main(
         resource_format = RST
     elif ipynb:
         resource_format = IPYNB
+    elif ansi:
+        resource_format = ANSI
 
     if resource_format == AUTO and "." in resource:
         import os.path
@@ -622,6 +627,14 @@ def main(
             guides,
             no_wrap,
         )
+    elif resource_format == ANSI:
+        from rich.text import Text
+
+        ansi_data, _lexer = read_resource(resource, lexer=None)
+        try:
+            renderable = Text.from_ansi(ansi_data)
+        except Exception as error:
+            on_error("unable to read ansi", error)
 
     else:
         if not resource:
