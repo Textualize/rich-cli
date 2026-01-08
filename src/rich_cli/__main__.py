@@ -375,6 +375,9 @@ class RichCommand(click.Command):
     "--no-wrap", is_flag=True, help="Don't word wrap syntax highlighted files."
 )
 @click.option(
+    "--no-wrap-code", is_flag=True, help="Don't wrap long lines in code blocks (for markdown)."
+)
+@click.option(
     "--title", metavar="TEXT", default="", help="Set panel title to [b]TEXT[/]."
 )
 @click.option(
@@ -437,6 +440,7 @@ def main(
     guides: bool = False,
     lexer: str = "",
     hyperlinks: bool = False,
+    no_wrap_code: bool = False,
     force_terminal: bool = False,
     export_html: str = "",
     export_svg: str = "",
@@ -579,7 +583,7 @@ def main(
         from .markdown import Markdown
 
         markdown_data, lexer = read_resource(resource, lexer)
-        renderable = Markdown(markdown_data, code_theme=theme, hyperlinks=hyperlinks)
+        renderable = Markdown(markdown_data, code_theme=theme, hyperlinks=hyperlinks, wrap_code=not no_wrap_code)
 
     elif resource_format == RST:
         from rich_rst import RestructuredText
