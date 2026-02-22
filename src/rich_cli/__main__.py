@@ -102,7 +102,13 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
         if path == "-":
             return (sys.stdin.read(), None)
 
-        with open(path, "rt", encoding="utf8", errors="replace") as resource_file:
+        with open(path,"rb") as check_file:
+            chunk = check_file.read(1024)
+            if b"\x00" in chunk:
+                on_error("cannot render binary file")
+                return
+
+        with open(path, "rt", encoding="utf8") as resource_file:
             text = resource_file.read()
         if not lexer:
             _, dot, ext = path.rpartition(".")
