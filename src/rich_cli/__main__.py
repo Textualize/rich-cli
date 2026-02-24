@@ -1,7 +1,7 @@
 from operator import itemgetter
 import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
-
+import os
 import click
 from pygments.util import ClassNotFound
 from rich.console import Console, RenderableType
@@ -98,6 +98,10 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
                     except Exception:
                         pass
         return (text, lexer)
+    
+
+    if path != "-" and os.path.isdir(path):
+        on_error(f"{escape(path)} is a directory, not a file")
     try:
         if path == "-":
             return (sys.stdin.read(), None)
