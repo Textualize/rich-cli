@@ -82,7 +82,7 @@ RICH_THEME=dracula rich loop.py
 
 By default, `rich` will wrap lines if they don't fit within the available width. You can disable this behavior with `--no-wrap`.
 
-`Rich` will try to deduce the format of the via from the filename. If you want to override the auto-detected _lexer_ you can explicitly set it with the `--lexer` or `-x` switch.
+`Rich` will try to deduce the file format from the filename. If you want to override the auto-detected _lexer_ you can explicitly set it with the `--lexer` or `-x` switch.
 
 ## Markdown
 
@@ -157,10 +157,11 @@ rich __main__.py -n -g --theme monokai --pager
 
 ## Network
 
-The `rich` command can read files from the internet you give it a URL starting with `http://` or `https://`.
+The `rich` command can read files from the internet if you give it a URL starting with `http://` or `https://`.
 
 ```
 rich https://raw.githubusercontent.com/Textualize/rich-cli/main/README.md --markdown
+
 ```
 
 ![network](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/network1.png)
