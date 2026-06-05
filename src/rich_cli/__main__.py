@@ -396,6 +396,11 @@ class RichCommand(click.Command):
     "--export-svg", metavar="PATH", default="", help="Write SVG to [b]PATH[/b]."
 )
 @click.option("--pager", is_flag=True, help="Display in an interactive pager.")
+@click.option(
+    "--no-pager-animation",
+    is_flag=True,
+    help="Disable scroll animation in the interactive pager.",
+)
 @click.option("--version", "-v", is_flag=True, help="Print version and exit.")
 def main(
     resource: str,
@@ -441,6 +446,7 @@ def main(
     export_html: str = "",
     export_svg: str = "",
     pager: bool = False,
+    no_pager_animation: bool = False,
 ):
     """Rich toolbox for console output."""
     if version:
@@ -707,7 +713,11 @@ def main(
             width = console.width
         render_options = console.options.update(width=width - 1)
         lines = console.render_lines(renderable, render_options, new_lines=True)
-        PagerApp.run(title=resource, content=PagerRenderable(lines, width=width))
+        PagerApp.run(
+            title=resource,
+            content=PagerRenderable(lines, width=width),
+            disable_animation=no_pager_animation,
+        )
 
     else:
         try:
