@@ -50,9 +50,11 @@ class PagerApp(App):
         self,
         *args,
         content=None,
+        disable_animation=False,
         **kwargs,
     ) -> None:
         self.content = content
+        self.disable_animation = disable_animation
         super().__init__(*args, **kwargs)
 
     async def on_load(self, event: events.Load) -> None:
@@ -67,10 +69,16 @@ class PagerApp(App):
             self.body.page_down()
         elif event.key == "ctrl+u":
             self.body.target_y -= self.body.size.height // 2
-            self.body.animate("y", self.body.target_y, easing="out_cubic")
+            if not self.disable_animation:
+                self.body.animate("y", self.body.target_y, easing="out_cubic")
+            else:
+                self.body.y = self.body.target_y
         elif event.key == "ctrl+d":
             self.body.target_y += self.body.size.height // 2
-            self.body.animate("y", self.body.target_y, easing="out_cubic")
+            if not self.disable_animation:
+                self.body.animate("y", self.body.target_y, easing="out_cubic")
+            else:
+                self.body.y = self.body.target_y
 
     async def on_mount(self, event: events.Mount) -> None:
         self.body = body = ScrollView(auto_width=True)
