@@ -84,6 +84,15 @@ By default, `rich` will wrap lines if they don't fit within the available width.
 
 `Rich` will try to deduce the format of the via from the filename. If you want to override the auto-detected _lexer_ you can explicitly set it with the `--lexer` or `-x` switch.
 
+### Head and Tail
+
+You can display just the first or last few lines of a file with `--head` or `-h`, and `--tail` or `-t`. These require `--syntax` or `--csv`.
+
+```
+rich script.py --syntax --head 10
+rich data.csv --csv --tail 5
+```
+
 ## Markdown
 
 You can request markdown rendering by adding the `--markdown` switch or `-m`. If the file ends with `.md` markdown will be auto-detected.
@@ -131,6 +140,14 @@ rich deniro.csv
 
 ![csv1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/csv1.png)
 
+## reStructuredText
+
+Rich-CLI can render reStructuredText files by adding the `--rst` switch. If the file ends with `.rst` this is auto-detected.
+
+```
+rich README.rst --rst
+```
+
 ### Rules
 
 You can render a horizontal rule with `--rule` or `-u`. Specify a rule style with `--rule-style`. Set the character(s) to render the line with `--rule-char`.
@@ -175,6 +192,12 @@ rich README.md -o readme.html
 
 After running this command you should find a "readme.html" in your current working directory.
 
+You can also export to SVG with `--export-svg` followed by an output path.
+
+```
+rich README.md --export-svg readme.svg
+```
+
 ## Rich Printing
 
 If you add the `--print` or `--p` option then Rich will treat the first argument as [console markup](https://rich.readthedocs.io/en/latest/markup.html) which allows you to insert styles with a markup similar in design to bbcode.
@@ -198,6 +221,26 @@ Note that when rich isn't writing directly to the terminal it will disable ansi 
 ```
 cat README.md | rich - --markdown --force-terminal
 ```
+
+## Emoji
+
+Add `--emoji` or `-j` to render emoji shortcodes (e.g. `:rocket:`) in printed text.
+
+```
+rich "Ship it :rocket:" --print --emoji
+```
+
+## Inspect
+
+Use `--inspect` to inspect a Python object or expression, similar to `rich.inspect()`.
+
+```
+rich --inspect "[1, 2, 3]"
+```
+
+## Version
+
+Run `rich --version` or `-v` to print the installed Rich-CLI version and exit.
 
 ## General Options
 
@@ -233,6 +276,14 @@ rich "I must not fear. Fear is the mind-killer. Fear is the little-death that br
 
 ![width](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/width1.png)
 
+### Max Width
+
+You can cap the output at a maximum of SIZE characters with `--max-width` or `-W`, without forcing shorter lines to pad out to that width.
+
+```
+rich "Hello World" --print --max-width 5
+```
+
 ### Text Justify
 
 You can set how `rich` will justify text with `--text-left`, `--text-right`, `--text-center`, and `--text-full`; or the single letter equivalents: `-L`, `-R`, `-C`, and `-F`.
@@ -267,3 +318,15 @@ rich "Hello, [b]World[/b]!" -p -a heavy
 ```
 
 ![panel1](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/panel1.png)
+
+You can style the panel itself (separately from its content) with `--panel-style` or `-S` (requires `--panel`):
+
+```
+rich "Hello" --print --panel heavy --panel-style "on blue"
+```
+
+Add a title or caption to the panel with `--title` and `--caption`:
+
+```
+rich "Hello" --print --panel rounded --title "Greeting"
+```
