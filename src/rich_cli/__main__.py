@@ -446,10 +446,19 @@ def main(
     if version:
         sys.stdout.write(f"{VERSION}\n")
         return
+    from rich.theme import Theme
+
     console = Console(
         emoji=emoji,
         record=bool(export_html or export_svg),
         force_terminal=force_terminal if force_terminal else None,
+        theme=Theme(
+            {
+                # Override Rich's dark defaults for readable inline/block code.
+                "markdown.code": "bold cyan",
+                "markdown.code_block": "cyan",
+            }
+        ),
     )
 
     def print_usage() -> None:
