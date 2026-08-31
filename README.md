@@ -23,7 +23,7 @@ pipx install rich-cli
 You can install Rich-CLI with [Homebrew](https://brew.sh/).
 
 ```
-brew install rich
+brew install rich-cli
 ```
 
 ### Universal
