@@ -751,6 +751,7 @@ def render_csv(
     import io
     import csv
     import re
+    from itertools import islice
     from rich import box
     from rich.table import Table
     from operator import itemgetter
@@ -758,10 +759,12 @@ def render_csv(
     is_number = re.compile(r"\-?[0-9]*?\.?[0-9]*?").fullmatch
 
     csv_data, _ = read_resource(resource, "csv")
+    # A character limit can cut a line short and confuse delimiter detection.
+    sample = "".join(islice(io.StringIO(csv_data), 100))
     sniffer = csv.Sniffer()
     try:
-        dialect = sniffer.sniff(csv_data[:1024], delimiters=",\t|;")
-        has_header = sniffer.has_header(csv_data[:1024])
+        dialect = sniffer.sniff(sample, delimiters=",\t|;")
+        has_header = sniffer.has_header(sample)
     except csv.Error as error:
         if resource.lower().endswith(".csv"):
             dialect = csv.get_dialect("excel")
