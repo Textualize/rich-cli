@@ -65,6 +65,12 @@ class PagerApp(App):
             self.body.scroll_down()
         elif event.key == " ":
             self.body.page_down()
+        elif event.key == "G":
+            self.body.target_y = self.body.window.virtual_size.height - self.body.size.height
+            self.body.animate("y", self.body.target_y, duration=1, easing="out_cubic")
+        elif event.key == "g":
+            self.body.target_y = 0
+            self.body.animate("y", self.body.target_y, duration=1, easing="out_cubic")
         elif event.key == "ctrl+u":
             self.body.target_y -= self.body.size.height // 2
             self.body.animate("y", self.body.target_y, easing="out_cubic")
