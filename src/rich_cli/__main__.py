@@ -377,9 +377,13 @@ class RichCommand(click.Command):
 @click.option(
     "--title", metavar="TEXT", default="", help="Set panel title to [b]TEXT[/]."
 )
+@click.option("--title-left", is_flag=True, help="Align title to left.")
+@click.option("--title-right", is_flag=True, help="Align title to right.")
 @click.option(
     "--caption", metavar="TEXT", default="", help="Set panel caption to [b]TEXT[/]."
 )
+@click.option("--caption-left", is_flag=True, help="Align caption to left.")
+@click.option("--caption-right", is_flag=True, help="Align caption to right.")
 @click.option(
     "--force-terminal",
     is_flag=True,
@@ -431,7 +435,11 @@ def main(
     panel: str = "",
     panel_style: str = "",
     title: str = "",
+    title_left: bool = False,
+    title_right: bool = False,
     caption: str = "",
+    caption_left: bool = False,
+    caption_right: bool = False,
     theme: str = "",
     line_numbers: bool = False,
     guides: bool = False,
@@ -664,13 +672,27 @@ def main(
         except Exception as error:
             on_error("unable to parse panel style", error)
 
-        renderable = Panel(
-            renderable,
-            getattr(box, panel.upper()),
+        panel_kwargs = dict(
             expand=expand,
             title=title,
             subtitle=caption,
             border_style=render_border_style,
+        )
+
+        if title_left or title_right:
+            if title_left and title_right:
+                on_error("cannot specify left and right title alignment")
+            panel_kwargs["title_align"] = "left" if title_left else "right"
+
+        if caption_left or caption_right:
+            if caption_left and caption_right:
+                on_error("cannot specify left and right caption alignment")
+            panel_kwargs["subtitle_align"] = "left" if caption_left else "right"
+
+        renderable = Panel(
+            renderable,
+            getattr(box, panel.upper()),
+            **panel_kwargs,
         )
 
     if style:
