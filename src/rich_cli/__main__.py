@@ -785,7 +785,7 @@ def render_csv(
     )
     rows = iter(reader)
     if has_header:
-        header = next(rows)
+        header = next(rows, [])
         for column in header:
             table.add_column(column)
 
