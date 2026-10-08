@@ -395,6 +395,12 @@ class RichCommand(click.Command):
 @click.option(
     "--export-svg", metavar="PATH", default="", help="Write SVG to [b]PATH[/b]."
 )
+@click.option(
+    "--preprocess-ansi",
+    is_flag=True,
+    help="Interpret and convert ANSI escape sequences before exporting HTML or SVG.",
+)
+
 @click.option("--pager", is_flag=True, help="Display in an interactive pager.")
 @click.option("--version", "-v", is_flag=True, help="Print version and exit.")
 def main(
@@ -440,6 +446,7 @@ def main(
     force_terminal: bool = False,
     export_html: str = "",
     export_svg: str = "",
+    preprocess_ansi: bool = False,
     pager: bool = False,
 ):
     """Rich toolbox for console output."""
@@ -720,17 +727,61 @@ def main(
         except Exception as error:
             on_error("failed to print resource", error)
 
-    if export_html:
-        try:
-            console.save_html(export_html, clear=False)
-        except Exception as error:
-            on_error("failed to save HTML", error)
+    from rich.ansi import AnsiDecoder
+    from rich.console import Group
 
-    if export_svg:
+    def preprocess_ansi_text(text: str) -> "RenderableType":
+        """Convert ANSI escape sequences into Rich renderables."""
+        from rich.text import Text
+
         try:
-            console.save_svg(export_svg, clear=False)
+            decoder = AnsiDecoder()
+            renderables = []
+            for part in decoder.decode(text):
+                if isinstance(part, str):
+                    renderables.append(Text(part))
+                else:
+                    renderables.append(part)
+            if not renderables:
+                return Text(text)
+            return Group(*renderables)
+        except Exception:
+            return Text(text)
+
+    # --- Export handling with optional ANSI preprocessing ---
+    if export_html or export_svg:
+        try:
+            if preprocess_ansi:
+                # Capture what was printed so far
+                # Capture everything the console has rendered so far as ANSI text
+                ansi_data = console.export_text(clear=False)
+                decoder = AnsiDecoder()
+                renderables = list(decoder.decode(ansi_data))
+
+                # Make sure everything is a valid Rich renderable
+                final_renderables = []
+                for item in renderables:
+                    if isinstance(item, str):
+                        final_renderables.append(Text(item))
+                    else:
+                        final_renderables.append(item)
+
+                # Combine and re-render
+                temp_console = Console(record=True)
+                temp_console.print(Group(*final_renderables))
+
+
+                if export_html:
+                    temp_console.save_html(export_html, clear=False)
+                if export_svg:
+                    temp_console.save_svg(export_svg, clear=False)
+            else:
+                if export_html:
+                    console.save_html(export_html, clear=False)
+                if export_svg:
+                    console.save_svg(export_svg, clear=False)
         except Exception as error:
-            on_error("failed to save SVG", error)
+            on_error("failed to save export", error)
 
 
 def render_csv(
