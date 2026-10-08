@@ -894,11 +894,16 @@ def render_ipynb(
             elif output_type == "error":
                 renderable = Text.from_ansi("\n".join(output["traceback"]).rstrip())
                 new_line = True
-            elif output_type == "execute_result":
-                execution_count = output.get("execution_count", " ") or " "
-                renderable = Text.from_markup(
-                    f"[red]Out[[#ee4b2b]{execution_count}[/#ee4b2b]]:[/red]\n"
-                )
+            elif output_type in ("execute_result", "display_data"):
+                if output_type == "execute_result":
+                    execution_count = output.get("execution_count", " ") or " "
+                    renderable = Text.from_markup(
+                        f"[red]Out[[#ee4b2b]{execution_count}[/#ee4b2b]]:[/red]\n"
+                    )
+                elif "text/plain" not in output["data"]:
+                    continue
+                else:
+                    renderable = Text()
                 data = output["data"].get("text/plain", "")
                 if isinstance(data, list):
                     renderable += Text.from_ansi("".join(data))
