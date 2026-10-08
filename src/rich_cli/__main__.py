@@ -923,8 +923,8 @@ def _line_range(
     if head:
         line_range = (1, head)
     elif tail:
-        start_line = num_lines - tail + 2
-        finish_line = num_lines + 1
+        start_line = max(1, num_lines - tail + 1)
+        finish_line = num_lines
         line_range = (start_line, finish_line)
     else:
         line_range = None
