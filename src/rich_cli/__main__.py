@@ -1,4 +1,5 @@
 from operator import itemgetter
+from importlib.metadata import PackageNotFoundError, version as distribution_version
 import sys
 from typing import TYPE_CHECKING, List, NoReturn, Optional, Tuple
 
@@ -37,7 +38,11 @@ COMMON_LEXERS = {
     "toml": "toml",
 }
 
-VERSION = "1.8.0"
+try:
+    VERSION = distribution_version("rich-cli")
+except PackageNotFoundError:
+    # Running an uninstalled source tree has no distribution version to report.
+    VERSION = "unknown"
 
 
 AUTO = 0
