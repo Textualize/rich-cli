@@ -38,7 +38,7 @@ if WINDOWS:
     def enable_windows_virtual_terminal_processing():
         """Context manager to enable virtual terminal processing on enter,
         and restore the previous setting on exit. Does nothing if run on
-        a non-Widows platfrom.
+        a non-Windows platform.
 
         """
         current_console_mode = _get_console_mode()
@@ -55,7 +55,7 @@ else:
     def enable_windows_virtual_terminal_processing():
         """Context manager to enable virtual terminal processing on enter,
         and restore the previous setting on exit. Does nothing if run on
-        a non-Widows platfrom.
+        a non-Windows platform.
 
         """
         yield
