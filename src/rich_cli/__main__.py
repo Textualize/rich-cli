@@ -787,7 +787,7 @@ def render_csv(
     if has_header:
         header = next(rows)
         for column in header:
-            table.add_column(column)
+            table.add_column(Text(column))
 
     table_rows = [row for row in rows if row]
     if head is not None:
@@ -796,7 +796,7 @@ def render_csv(
         table_rows = table_rows[-tail:]
     for row in table_rows:
         if row:
-            table.add_row(*row)
+            table.add_row(*(Text(value) for value in row))
 
     for index, table_column in enumerate(table.columns):
         get_index = itemgetter(index)
