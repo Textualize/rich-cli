@@ -75,7 +75,11 @@ def read_resource(path: str, lexer: Optional[str]) -> Tuple[str, Optional[str]]:
     if path.startswith(("http://", "https://")):
         import requests
 
-        response = requests.get(path)
+        try:
+            response = requests.get(path)
+            response.raise_for_status()
+        except requests.RequestException as error:
+            on_error(f"unable to read {escape(path)}", error)
 
         text = response.text
         try:
