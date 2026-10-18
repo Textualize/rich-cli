@@ -1,3 +1,5 @@
+import pytest
+
 import click
 from click import Command
 from click.decorators import FC, Parameter
@@ -39,3 +41,33 @@ def test_duplicate_option_flags_raises_exception(monkeypatch):
 
     runner = CliRunner()
     runner.invoke(main)
+
+
+@pytest.mark.parametrize("soft", [False, True])
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        ("", ""),
+        ("hello", "hello"),
+        ("hello\n", "hello\n"),
+        ("hello\n\n", "hello\n\n"),
+        ("[bold]hello[/bold]\n", "hello\n"),
+    ],
+)
+def test_print_stdin_preserves_line_endings(soft, source, expected):
+    import rich_cli.__main__ as cli
+
+    args = ["-", "--print"]
+    if soft:
+        args.append("--soft")
+    result = CliRunner().invoke(cli.main, args, input=source)
+    assert result.exit_code == 0, result.output
+    assert result.output == expected
+
+
+def test_print_argument_keeps_terminal_newline():
+    import rich_cli.__main__ as cli
+
+    result = CliRunner().invoke(cli.main, ["hello", "--print"])
+    assert result.exit_code == 0, result.output
+    assert result.output == "hello\n"
