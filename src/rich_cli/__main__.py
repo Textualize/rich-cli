@@ -715,6 +715,7 @@ def main(
                 renderable,
                 width=None if max_width <= 0 else max_width,
                 soft_wrap=soft,
+                end="" if resource_format == PRINT and resource == "-" else "\n",
                 justify=justify,
             )
         except Exception as error:
