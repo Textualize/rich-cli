@@ -707,7 +707,7 @@ def main(
             width = console.width
         render_options = console.options.update(width=width - 1)
         lines = console.render_lines(renderable, render_options, new_lines=True)
-        PagerApp.run(title=resource, content=PagerRenderable(lines, width=width))
+        PagerApp(content=PagerRenderable(lines, width=width), title=resource).run()
 
     else:
         try:

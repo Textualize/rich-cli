@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing yet
+### Changed
+
+- The `--pager` viewer was ported to current Textual; Rich-CLI now requires textual >= 1.0.0 and rich >= 13.3.3
 
 ## [1.8.1] - 2025-07-04
 
